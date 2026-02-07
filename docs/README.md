@@ -36,6 +36,7 @@ title: Project Template
 ## Introduction
 
 Description of the real world problem and solution, impact
+Passengers don’t know the exact location of buses. They wait a long time at bus stops without any information. Don’t know how crowded a bus is. Difficult to find AC buses and book seats. No clear information during emergency situations. From the drivers' side they don’t know where other buses are. Don’t know how many passengers are waiting. No easy way to see traffic and road conditions.
 
 
 ## Solution Architecture
