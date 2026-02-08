@@ -3,20 +3,21 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: eYY-3yp-project-template
+repository-name: e21-3yp-RouteLK
 title: Project Template
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Project Title
+# RouteLK : Smart Bus Tracking & Passenger Assistance App
 
 ---
 
 ## Team
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
+-  E/21/017, Thimal Adeesha, [e21017@eng.pdn.ac.lk](mailto:name@email.com)
+-  E/21/126, Dinithi Epitakaduwa, [e21126@eng.pdn.ac.lk](mailto:name@email.com)
+-  E/21/372, Lakshika Seneviratne, [e21372@eng.pdn.ac.lk](mailto:name@email.com)
+-  E/21/391, Walter Ravindu, [e21391@eng.pdn.ac.lk](mailto:name@email.com)
 
 <!-- Image (photo/drawing of the final hardware) should be here -->
 
