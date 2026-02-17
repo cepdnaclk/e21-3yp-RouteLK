@@ -36,9 +36,19 @@ title: RouteLK
 
 ## Introduction
 
-Description of the real world problem and solution, impact
-Passengers don’t know the exact location of buses. They wait a long time at bus stops without any information. Don’t know how crowded a bus is. Difficult to find AC buses and book seats. No clear information during emergency situations. From the drivers' side they don’t know where other buses are. Don’t know how many passengers are waiting. No easy way to see traffic and road conditions.
+Public transportation systems in developing regions often suffer from poor visibility, unpredictable arrival times, overcrowding, and lack of reliable passenger information. Traditional bus systems operate without real-time tracking, accurate occupancy monitoring, or intelligent data handling mechanisms, resulting in passenger inconvenience and operational inefficiencies.
 
+The Bus Tracking & Passenger Assistance System is an IoT- and cloud-powered intelligent transport solution designed to address these challenges. The system integrates embedded hardware, real-time GPS tracking, passenger counting logic, cloud-based data processing, and a mobile application interface to deliver:
+
+Real-time bus location tracking
+Intelligent passenger counting
+Dynamic crowd-level estimation
+Traffic-aware arrival time prediction
+Robust offline data handling
+
+By combining embedded systems (ESP32 + IR sensors + GPS), wireless communication, and scalable backend services, the solution ensures accurate monitoring even in unstable network conditions.
+
+This system demonstrates how IoT and cloud technologies can modernize public transportation with cost-effective and scalable architecture.
 
 ## Solution Architecture
 
