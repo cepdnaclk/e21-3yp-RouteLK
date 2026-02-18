@@ -6,6 +6,40 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'firebase_options.dart';
 
+// Bus data model to store location, passenger count, and route
+class BusData {
+  final LatLng location;
+  final int passengers;
+  final String route;
+
+  BusData({
+    required this.location,
+    required this.passengers,
+    required this.route,
+  });
+
+  // Determine occupancy level and return color
+  Color get occupancyColor {
+    if (passengers < 20) {
+      return Colors.green; // Low occupancy
+    } else if (passengers < 40) {
+      return Colors.orange; // Moderate occupancy
+    } else {
+      return Colors.red; // High occupancy
+    }
+  }
+
+  String get occupancyLevel {
+    if (passengers < 20) {
+      return 'Low';
+    } else if (passengers < 40) {
+      return 'Moderate';
+    } else {
+      return 'High';
+    }
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -35,15 +69,20 @@ class BusMapPage extends StatefulWidget {
 
 class _BusMapPageState extends State<BusMapPage> {
   LatLng? myCurrentLocation;
-  LatLng? busLocation; // Real-time bus location from Firebase
+  Map<String, BusData> busData =
+      {}; // Multiple bus data (location + passengers + route) from Firebase
   final MapController mapController = MapController();
-  late DatabaseReference busLocationRef;
+  late DatabaseReference busesRef;
+
+  // Route filtering
+  String? selectedRoute; // Currently selected route
+  List<String> availableRoutes = []; // List of all available routes
 
   @override
   void initState() {
     super.initState();
     _determinePosition();
-    _listenToBusLocation();
+    _listenToBusLocations();
   }
 
   @override
@@ -51,46 +90,68 @@ class _BusMapPageState extends State<BusMapPage> {
     super.dispose();
   }
 
-  // Listen to Firebase Realtime Database for bus location updates
-  void _listenToBusLocation() {
-    // Firebase path: /bus/location
-    // Expected structure: { "latitude": 7.2906, "longitude": 80.6337 }
-    busLocationRef = FirebaseDatabase.instance.ref('bus/location');
+  // Listen to Firebase Realtime Database for multiple bus data updates
+  void _listenToBusLocations() {
+    // Firebase path: /buses
+    // Expected structure:
+    // buses/
+    //   bus1: { "latitude": 7.3, "longitude": 80.593, "passengers": 45, "route": "Kandy-Gampola" }
+    //   bus2: { "latitude": 7.35, "longitude": 80.6, "passengers": 15, "route": "Kandy-Peradeniya" }
+    busesRef = FirebaseDatabase.instance.ref('buses');
 
-    busLocationRef.onValue.listen(
+    busesRef.onValue.listen(
       (DatabaseEvent event) {
         final data = event.snapshot.value;
 
-        // Print raw data from Firebase
         print('=== Firebase Data Received ===');
         print('Raw data: $data');
         print('Data type: ${data.runtimeType}');
 
         if (data != null && data is Map) {
-          try {
-            final lat = (data['latitude'] as num).toDouble();
-            // Handle both 'longitude' and 'longitute' typo in Firebase
-            final lng =
-                (data.containsKey('longitude')
-                        ? data['longitude']
-                        : data['longitute'])
-                    as num;
-            final lngDouble = lng.toDouble();
+          Map<String, BusData> updatedBusData = {};
 
-            // Print parsed values
-            print('Parsed Latitude: $lat');
-            print('Parsed Longitude: $lngDouble');
-            print('==============================');
+          data.forEach((key, value) {
+            if (value is Map) {
+              try {
+                final lat = (value['latitude'] as num).toDouble();
+                // Handle both 'longitude' and 'longitute' typo in Firebase
+                final lng =
+                    (value.containsKey('longitude')
+                            ? value['longitude']
+                            : value['longitute'])
+                        as num;
+                final lngDouble = lng.toDouble();
 
-            setState(() {
-              busLocation = LatLng(lat, lngDouble);
-            });
+                // Get passenger count, default to 0 if not provided
+                final passengers = (value['passengers'] as num?)?.toInt() ?? 0;
 
-            debugPrint('Bus location updated: $lat, $lngDouble');
-          } catch (e) {
-            print('Error parsing bus location: $e');
-            debugPrint('Error parsing bus location: $e');
-          }
+                // Get route, default to 'Unknown' if not provided
+                final route = (value['route'] as String?) ?? 'Unknown';
+
+                updatedBusData[key.toString()] = BusData(
+                  location: LatLng(lat, lngDouble),
+                  passengers: passengers,
+                  route: route,
+                );
+                print(
+                  'Bus $key: $lat, $lngDouble, Passengers: $passengers, Route: $route',
+                );
+              } catch (e) {
+                print('Error parsing bus $key: $e');
+              }
+            }
+          });
+
+          setState(() {
+            busData = updatedBusData;
+            // Extract unique routes from bus data
+            availableRoutes =
+                busData.values.map((bus) => bus.route).toSet().toList()..sort();
+          });
+
+          print('Total buses: ${busData.length}');
+          print('Available routes: $availableRoutes');
+          print('==============================');
         } else {
           print('No data received or data is not a Map');
           print('==============================');
@@ -100,7 +161,7 @@ class _BusMapPageState extends State<BusMapPage> {
         print('=== Firebase Error ===');
         print('Error: $error');
         print('======================');
-        debugPrint('Error listening to bus location: $error');
+        debugPrint('Error listening to bus locations: $error');
       },
     );
   }
@@ -150,8 +211,20 @@ class _BusMapPageState extends State<BusMapPage> {
     });
   }
 
+  // Get filtered buses based on selected route
+  Map<String, BusData> get filteredBusData {
+    if (selectedRoute == null) {
+      return busData; // Show all buses if no route selected
+    }
+    return Map.fromEntries(
+      busData.entries.where((entry) => entry.value.route == selectedRoute),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayBusData = filteredBusData; // Buses to display on map
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Bus Tracker - Real-time"),
@@ -186,83 +259,307 @@ class _BusMapPageState extends State<BusMapPage> {
                             size: 40,
                           ),
                         ),
-                        // Bus location (green bus icon) - only show if data exists
-                        if (busLocation != null)
-                          Marker(
-                            point: busLocation!,
-                            width: 60,
-                            height: 60,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 5,
-                                    spreadRadius: 1,
+                        // Bus markers - create one for each bus with color-coded occupancy
+                        ...displayBusData.entries.map((entry) {
+                          final busId = entry.key;
+                          final bus = entry.value;
+                          final busColor = bus.occupancyColor;
+
+                          return Marker(
+                            point: bus.location,
+                            width: 70,
+                            height: 70,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 5,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.directions_bus,
-                                color: Colors.green,
-                                size: 35,
-                              ),
+                                  child: Icon(
+                                    Icons.directions_bus,
+                                    color: busColor,
+                                    size: 35,
+                                  ),
+                                ),
+                                // Bus ID and passenger count label below the icon
+                                Positioned(
+                                  bottom: -5,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: busColor,
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          busId,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
+                                          border: Border.all(
+                                            color: busColor,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.person,
+                                              size: 8,
+                                              color: busColor,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${bus.passengers}',
+                                              style: TextStyle(
+                                                color: busColor,
+                                                fontSize: 8,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                          );
+                        }).toList(),
                       ],
                     ),
                   ],
                 ),
-                // Bus location info card
-                if (busLocation != null)
+                // Route selector dropdown
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Card(
+                    elevation: 4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.route,
+                                size: 16,
+                                color: Colors.deepOrange,
+                              ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'Select Route:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: DropdownButton<String>(
+                              value: selectedRoute,
+                              hint: const Text(
+                                'All Routes',
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              isExpanded: false,
+                              underline: const SizedBox(),
+                              icon: const Icon(Icons.arrow_drop_down, size: 20),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.black87,
+                              ),
+                              items: [
+                                const DropdownMenuItem<String>(
+                                  value: null,
+                                  child: Text('All Routes'),
+                                ),
+                                ...availableRoutes.map((route) {
+                                  return DropdownMenuItem<String>(
+                                    value: route,
+                                    child: Text(route),
+                                  );
+                                }).toList(),
+                              ],
+                              onChanged: (String? newRoute) {
+                                setState(() {
+                                  selectedRoute = newRoute;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Bus location info card with passenger counts
+                if (displayBusData.isNotEmpty)
                   Positioned(
                     top: 10,
                     right: 10,
                     child: Card(
-                      color: Colors.green.shade50,
+                      color: Colors.blue.shade50,
                       elevation: 4,
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.directions_bus,
-                              color: Colors.green,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
-                                  'Bus Location',
-                                  style: TextStyle(
+                                const Icon(
+                                  Icons.directions_bus,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${displayBusData.length} Bus${displayBusData.length > 1 ? "es" : ""}${selectedRoute != null ? " on $selectedRoute" : " Active"}',
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),
                                 ),
-                                Text(
-                                  '${busLocation!.latitude.toStringAsFixed(6)}, ${busLocation!.longitude.toStringAsFixed(6)}',
-                                  style: const TextStyle(fontSize: 10),
-                                ),
                               ],
                             ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.center_focus_strong,
-                                size: 20,
-                              ),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () {
-                                mapController.move(busLocation!, 16);
-                              },
-                              tooltip: 'Center on bus',
+                            const SizedBox(height: 6),
+                            ...displayBusData.entries.map((entry) {
+                              final bus = entry.value;
+                              final busColor = bus.occupancyColor;
+
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Bus ID
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: busColor,
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                      child: Text(
+                                        entry.key,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    // Passenger count and occupancy
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: busColor.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(3),
+                                        border: Border.all(
+                                          color: busColor,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.person,
+                                            size: 10,
+                                            color: busColor,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            '${bus.passengers}',
+                                            style: TextStyle(
+                                              color: busColor,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            bus.occupancyLevel,
+                                            style: TextStyle(
+                                              color: busColor,
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            const SizedBox(height: 6),
+                            // Legend
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildLegendItem(Colors.green, 'Low (<20)'),
+                                const SizedBox(width: 6),
+                                _buildLegendItem(Colors.orange, 'Mod (20-40)'),
+                                const SizedBox(width: 6),
+                                _buildLegendItem(Colors.red, 'High (>40)'),
+                              ],
                             ),
                           ],
                         ),
@@ -270,7 +567,35 @@ class _BusMapPageState extends State<BusMapPage> {
                     ),
                   ),
                 // No bus data message
-                if (busLocation == null)
+                if (displayBusData.isEmpty && busData.isNotEmpty)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Card(
+                      color: Colors.blue.shade50,
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.blue,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'No buses on ${selectedRoute ?? "this route"}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                // Waiting for data message
+                if (busData.isEmpty)
                   Positioned(
                     top: 10,
                     right: 10,
@@ -302,13 +627,48 @@ class _BusMapPageState extends State<BusMapPage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Center on bus button
-          if (busLocation != null)
+          // View all buses button
+          if (displayBusData.isNotEmpty)
             FloatingActionButton(
-              heroTag: 'busBtn',
+              heroTag: 'viewAllBusesBtn',
               mini: true,
               onPressed: () {
-                mapController.move(busLocation!, 16);
+                // Calculate bounds to show all buses
+                if (displayBusData.isNotEmpty) {
+                  double minLat = displayBusData.values.first.location.latitude;
+                  double maxLat = displayBusData.values.first.location.latitude;
+                  double minLng =
+                      displayBusData.values.first.location.longitude;
+                  double maxLng =
+                      displayBusData.values.first.location.longitude;
+
+                  for (var bus in displayBusData.values) {
+                    if (bus.location.latitude < minLat)
+                      minLat = bus.location.latitude;
+                    if (bus.location.latitude > maxLat)
+                      maxLat = bus.location.latitude;
+                    if (bus.location.longitude < minLng)
+                      minLng = bus.location.longitude;
+                    if (bus.location.longitude > maxLng)
+                      maxLng = bus.location.longitude;
+                  }
+
+                  // Add padding to bounds
+                  final latPadding = (maxLat - minLat) * 0.1;
+                  final lngPadding = (maxLng - minLng) * 0.1;
+
+                  final bounds = LatLngBounds(
+                    LatLng(minLat - latPadding, minLng - lngPadding),
+                    LatLng(maxLat + latPadding, maxLng + lngPadding),
+                  );
+
+                  mapController.fitCamera(
+                    CameraFit.bounds(
+                      bounds: bounds,
+                      padding: const EdgeInsets.all(50),
+                    ),
+                  );
+                }
               },
               backgroundColor: Colors.green,
               child: const Icon(Icons.directions_bus),
@@ -327,6 +687,22 @@ class _BusMapPageState extends State<BusMapPage> {
           ),
         ],
       ),
+    );
+  }
+
+  // Helper method to build legend items
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 2),
+        Text(label, style: const TextStyle(fontSize: 7, color: Colors.black54)),
+      ],
     );
   }
 }
