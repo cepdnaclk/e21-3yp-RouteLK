@@ -52,57 +52,7 @@ This system demonstrates how IoT and cloud technologies can modernize public tra
 
 ## Solution Architecture
 
-Architectural Description
 
-1. Edge Layer (Bus Device)
-
-Installed inside the bus, this layer performs real-time sensing and local processing:
-
-Passenger detection via IR sensors
-GPS coordinate and speed acquisition
-Passenger count updates using directional logic
-Data packaging into JSON format
-Internet connectivity management
-Local data caching during network failure
-
-The ESP32 acts as the central controller, handling interrupts from sensors and serial communication with the GPS module.
-
-2. Communication Layer
-
-Data transmitted every 10 seconds
-Uses WiFi or 2G connectivity through SIM 800L GSM module
-Supports MQTT or REST transmission
-Automatic offline detection via server ping monitoring
-
-If connectivity drops:
-  System switches to offline mode
-  Logs telemetry data locally on SD card
-  Synchronizes once internet reconnects
-
-3. Cloud Backend Layer
-
-Responsibilities include:
-  Receiving IoT telemetry
-  Timestamp-based data reordering
-  Database storage
-  Providing REST APIs to mobile application
-  Handling offline synchronization batches
-  Detecting crowd level
-
-This ensures data consistency and zero data loss.
-
-4. Application Layer (Passenger App)
-
-The mobile application provides:
-  Live map visualization
-  Real-time bus marker updates
-  Traffic-aware ETA
-  Crowd-level indication (Low/Medium/High) using suitable colours
-  Optional arrival notifications
-
-Traffic data is integrated via APIs such as:
-
-  Google Maps Platform
 
 ## Hardware and Software Designs
 
