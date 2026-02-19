@@ -110,38 +110,6 @@ Traffic data is integrated via APIs such as:
 
 ## Testing
 
-1. Hardware Testing
-1.1 IR Sensor Testing
-
-Single passenger entry
-Single passenger exit
-Multiple passengers closely spaced
-Simultaneous front and rear door usage
-
-1.2 GPS Accuracy Testing
-
-Static location test
-Moving vehicle test
-Urban obstruction scenarios
-
-1.3 Power Stability Testing
-
-Long-duration operation
-
-2. Software Testing
-
-2.1 Offline Mode Testing
-
-Internet manually disconnected - System switched to offline mode after 3 failed pings, Data logged to SD card
-
-On reconnect:
-
-Data uploaded in batches, Server acknowledgment verified, Local logs cleared
-
-2.2 API Testing
-
-Stress tested with simulated multiple buses, Verifing timestamp ordering, testing invalid packet handling
-
 
 
 
