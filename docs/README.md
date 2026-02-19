@@ -52,15 +52,216 @@ This system demonstrates how IoT and cloud technologies can modernize public tra
 
 ## Solution Architecture
 
-High level diagram + description
+Architectural Description
+
+1. Edge Layer (Bus Device)
+
+Installed inside the bus, this layer performs real-time sensing and local processing:
+
+Passenger detection via IR sensors
+GPS coordinate and speed acquisition
+Passenger count updates using directional logic
+Data packaging into JSON format
+Internet connectivity management
+Local data caching during network failure
+
+The ESP32 acts as the central controller, handling interrupts from sensors and serial communication with the GPS module.
+
+2. Communication Layer
+
+Data transmitted every 10 seconds
+Uses WiFi or 2G connectivity through SIM 800L GSM module
+Supports MQTT or REST transmission
+Automatic offline detection via server ping monitoring
+
+If connectivity drops:
+  System switches to offline mode
+  Logs telemetry data locally on SD card
+  Synchronizes once internet reconnects
+
+3. Cloud Backend Layer
+
+Responsibilities include:
+  Receiving IoT telemetry
+  Timestamp-based data reordering
+  Database storage
+  Providing REST APIs to mobile application
+  Handling offline synchronization batches
+  Detecting crowd level
+
+This ensures data consistency and zero data loss.
+
+4. Application Layer (Passenger App)
+
+The mobile application provides:
+  Live map visualization
+  Real-time bus marker updates
+  Traffic-aware ETA
+  Crowd-level indication (Low/Medium/High) using suitable colours
+  Optional arrival notifications
+
+Traffic data is integrated via APIs such as:
+
+  Google Maps Platform
 
 ## Hardware and Software Designs
 
-Detailed designs with many sub-sections
+1. Hardware Design
+   
+1.1 Core Controller – ESP32
+
+Dual-core processor
+Built-in Wi-Fi & Bluetooth
+FreeRTOS support
+Multiple UART/SPI interfaces
+Interrupt handling for IR sensors
+
+Why selected:
+Balanced cost-performance ratio
+Sufficient RAM for JSON handling
+Real-time interrupt capability
+We don't need to run ML models
+
+1.2 Passenger Counting System
+
+Sensor Placement
+
+Front Door:
+Sensor 1 (Bottom Step)
+Sensor 2 (Top Step)
+
+Back Door:
+Sensor 3 (Bottom Step)
+Sensor 4 (Top Step)
+
+Direction Logic
+
+Entry:
+Sensor1 → Sensor2
+Exit:
+Sensor2 → Sensor1
+Same logic applies for both doors.
+
+1.3 GPS Tracking – NEO-M8N
+
+Provides latitude & longitude
+Speed calculation
+NMEA protocol via UART
+
+1.4 Power Management
+
+3.7 V 1800 mAh Li-Ion rechargeable battery
+
+1.5 Local Storage (Offline Mode)
+
+SD card module
+
+Stores JSON records:
+Timestamp
+GPS location
+Speed
+Passenger count
+Event type - Emergency button press
+
+2. Software Design
+2.1 Embedded Firmware (ESP32)
+
+Modules:
+
+Sensor Interrupt Handler
+Passenger Counting Logic
+GPS Data Parser
+JSON Packet Builder
+Connectivity Monitor
+Offline Logger
+Sync Manager
+
+Real-Time Execution:
+
+Non-blocking architecture
+Interrupt-driven counting
+Periodic telemetry transmission
+
+2.2 Backend Software
+
+Core Functional Modules:
+
+IoT Data Receiver (MQTT/REST)
+Timestamp Validator
+Batch Sync Handler
+Database Storage Layer
+REST API Server
+Analytics Engine
+
+Data Reordering:
+Late packets are sorted using timestamps before insertion.
+
+2.3 Mobile Application
+
+Features:
+
+Live bus markers
+Color-coded crowd levels (Green – Low, Yellow – Medium, Red – Crowded)
+Route polyline rendering
+Bus detail card (ETA, Occupancy)
+
+Update Frequency:
+
+Every 5–10 seconds via real-time database/socket.
 
 ## Testing
 
-Testing done on hardware and software, detailed + summarized results
+1. Hardware Testing
+1.1 IR Sensor Testing
+
+Single passenger entry
+Single passenger exit
+Multiple passengers closely spaced
+Simultaneous front and rear door usage
+
+1.2 GPS Accuracy Testing
+
+Static location test
+Moving vehicle test
+Urban obstruction scenarios
+
+1.3 Power Stability Testing
+
+Long-duration operation
+
+2. Software Testing
+
+2.1 Offline Mode Testing
+
+Internet manually disconnected - System switched to offline mode after 3 failed pings, Data logged to SD card
+
+On reconnect:
+
+Data uploaded in batches, Server acknowledgment verified, Local logs cleared
+
+2.2 API Testing
+
+Stress tested with simulated multiple buses, Verifing timestamp ordering, testing invalid packet handling
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Detailed budget
 
