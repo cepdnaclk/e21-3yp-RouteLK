@@ -139,7 +139,7 @@ Sensor detection → ESP32 processing → Cloud transmission → Backend storage
 | SIM 800L 2G GSM Module | 1  | 1500 LKR   | 1500 LKR   |
 | 16x2 I2C LCD Character Display | 1  | 1000 LKR   |  1000 LKR  |
 | Push Buttons | 2  | 35 LKR  |  70 LKR  |
-| Other components  |    |    | 5000 LKR   |
+| Other components (cables etc.) |    |    | 5000 LKR   |
 | Estimated Total Cost  |    |    | 20000 LKR   |
 
 ## Conclusion
