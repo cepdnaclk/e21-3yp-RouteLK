@@ -11,7 +11,10 @@ import '../utils/map_utils.dart';
 
 /// Main page displaying the bus tracking map
 class BusMapPage extends StatefulWidget {
-  const BusMapPage({super.key});
+  /// Optionally start the map with a specific route selected.
+  final String? initialRoute;
+
+  const BusMapPage({super.key, this.initialRoute});
 
   @override
   State<BusMapPage> createState() => _BusMapPageState();
@@ -30,6 +33,8 @@ class _BusMapPageState extends State<BusMapPage> {
   @override
   void initState() {
     super.initState();
+    // respect any initialRoute passed from previous screen
+    selectedRoute = widget.initialRoute;
     _initializeLocation();
     _listenToBusLocations();
   }
