@@ -5,7 +5,20 @@ import 'pages/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+  } on FirebaseException catch (e) {
+    // Android can auto-create the default Firebase app from resources.
+    if (e.code != 'duplicate-app') {
+      rethrow;
+    }
+  }
+
   runApp(const BusTrackerApp());
 }
 

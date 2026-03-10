@@ -9,7 +9,6 @@ import '../services/firebase_bus_service.dart';
 import '../services/open_route_service.dart';
 import '../widgets/bus_marker.dart';
 import '../widgets/route_selector.dart';
-import '../widgets/bus_info_card.dart';
 import '../utils/map_utils.dart';
 
 /// Main page displaying the bus tracking map
@@ -25,6 +24,7 @@ class BusMapPage extends StatefulWidget {
 
 class _BusMapPageState extends State<BusMapPage> {
   LatLng? myCurrentLocation;
+  LatLng _startLocation = LocationService.defaultLocation;
   Map<String, BusData> busData = {};
   final MapController mapController = MapController();
   final FirebaseBusService _busService = FirebaseBusService();
@@ -40,10 +40,14 @@ class _BusMapPageState extends State<BusMapPage> {
   String? _estimateMessage;
   bool _isApproximateEstimate = false;
   int _etaRequestVersion = 0;
+  bool _hasAdjustedInitialMapView = false;
+  bool _isMapReady = false;
+  bool _hasFocusedUserOnLoad = false;
 
   // Route filtering
   String? selectedRoute;
   List<String> availableRoutes = [];
+  bool _showRouteSelector = false;
 
   @override
   void initState() {
@@ -66,8 +70,30 @@ class _BusMapPageState extends State<BusMapPage> {
   /// Initialize user's current location
   Future<void> _initializeLocation() async {
     final location = await LocationService.determinePosition();
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       myCurrentLocation = location;
+      _startLocation = location;
+    });
+
+    _focusUserOnLoad();
+  }
+
+  void _focusUserOnLoad() {
+    if (_hasFocusedUserOnLoad || !_isMapReady || myCurrentLocation == null) {
+      return;
+    }
+
+    _hasFocusedUserOnLoad = true;
+    _hasAdjustedInitialMapView = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || myCurrentLocation == null) {
+        return;
+      }
+      mapController.move(myCurrentLocation!, 17);
     });
   }
 
@@ -83,6 +109,11 @@ class _BusMapPageState extends State<BusMapPage> {
           busData = updatedBusData;
           availableRoutes = _busService.getAvailableRoutes(busData);
 
+          // If the preselected route is no longer available, fall back to all routes.
+          if (selectedRoute != null && !availableRoutes.contains(selectedRoute)) {
+            selectedRoute = null;
+          }
+
           if (hasSelectedBus && !selectedStillExists) {
             _selectedBusId = null;
             _selectedBusEstimate = null;
@@ -95,11 +126,32 @@ class _BusMapPageState extends State<BusMapPage> {
         if (selectedStillExists) {
           _scheduleEstimateRefresh();
         }
+
+        _maybeAutoFitToBuses();
       },
       onError: (error) {
         debugPrint('Error listening to bus locations: $error');
       },
     );
+  }
+
+  void _maybeAutoFitToBuses() {
+    if (!_isMapReady || _hasAdjustedInitialMapView) {
+      return;
+    }
+
+    final displayBuses = filteredBusData;
+    if (displayBuses.isEmpty) {
+      return;
+    }
+
+    _hasAdjustedInitialMapView = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      MapUtils.fitToBuses(mapController, displayBuses);
+    });
   }
 
   void _listenToUserLocation() {
@@ -148,8 +200,7 @@ class _BusMapPageState extends State<BusMapPage> {
 
   Future<void> _refreshSelectedBusEstimate() async {
     final selectedBusId = _selectedBusId;
-    final userLocation = myCurrentLocation;
-    if (selectedBusId == null || userLocation == null) {
+    if (selectedBusId == null) {
       return;
     }
 
@@ -169,7 +220,7 @@ class _BusMapPageState extends State<BusMapPage> {
 
     try {
       final estimate = await _openRouteService.fetchEtaAndDistance(
-        from: userLocation,
+        from: _startLocation,
         to: selectedBus.location,
       );
 
@@ -189,7 +240,7 @@ class _BusMapPageState extends State<BusMapPage> {
       }
 
       final fallbackEstimate = _buildFallbackEstimate(
-        from: userLocation,
+        from: _startLocation,
         to: selectedBus.location,
       );
 
@@ -232,9 +283,7 @@ class _BusMapPageState extends State<BusMapPage> {
 
   /// Handle centering on user's location
   void _centerOnMyLocation() {
-    if (myCurrentLocation != null) {
-      mapController.move(myCurrentLocation!, 15);
-    }
+    mapController.move(myCurrentLocation ?? _startLocation, 17);
   }
 
   @override
@@ -246,16 +295,15 @@ class _BusMapPageState extends State<BusMapPage> {
         title: const Text("Bus Tracker - Real-time"),
         backgroundColor: Colors.deepOrange,
       ),
-      body: myCurrentLocation == null
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                _buildMap(displayBusData),
-                _buildRouteSelector(),
-                _buildInfoCards(displayBusData),
-                _buildSelectedBusEtaCard(),
-              ],
-            ),
+      body: Stack(
+        children: [
+          _buildMap(displayBusData),
+          _buildRouteMenuButton(),
+          _buildRouteSelectorPanel(),
+          _buildTopPromptMessage(),
+          _buildSelectedBusEtaCard(),
+        ],
+      ),
       floatingActionButton: _buildFloatingButtons(displayBusData),
     );
   }
@@ -265,26 +313,42 @@ class _BusMapPageState extends State<BusMapPage> {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: LatLng(7.2906, 80.6337), // Kandy center
-        initialZoom: 12,
+        initialCenter: _startLocation,
+        initialZoom: 17,
+        onMapReady: () {
+          _isMapReady = true;
+          _focusUserOnLoad();
+          _maybeAutoFitToBuses();
+        },
       ),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.bus_tracker',
         ),
         MarkerLayer(
           markers: [
-            // User's current location marker
             Marker(
-              point: myCurrentLocation!,
-              width: 50,
-              height: 50,
+              point: _startLocation,
+              width: 24,
+              height: 24,
               child: const Icon(
-                Icons.my_location,
+                Icons.place,
                 color: Colors.blue,
-                size: 40,
+                size: 20,
               ),
             ),
+            if (myCurrentLocation != null)
+              Marker(
+                point: myCurrentLocation!,
+                width: 22,
+                height: 22,
+                child: const Icon(
+                  Icons.my_location,
+                  color: Colors.red,
+                  size: 18,
+                ),
+              ),
             // Bus markers
             ...displayBusData.entries
                 .map(
@@ -459,39 +523,82 @@ class _BusMapPageState extends State<BusMapPage> {
     );
   }
 
-  /// Build route selector widget
-  Widget _buildRouteSelector() {
+  Widget _buildRouteMenuButton() {
     return Positioned(
       top: 10,
       left: 10,
-      child: RouteSelector(
-        selectedRoute: selectedRoute,
-        availableRoutes: availableRoutes,
-        onRouteChanged: (newRoute) {
-          setState(() {
-            selectedRoute = newRoute;
-          });
-        },
+      child: Material(
+        color: Colors.white,
+        elevation: 3,
+        borderRadius: BorderRadius.circular(12),
+        child: IconButton(
+          tooltip: 'Select Route',
+          icon: const Icon(Icons.filter_list),
+          color: Colors.deepOrange,
+          onPressed: () {
+            setState(() {
+              _showRouteSelector = !_showRouteSelector;
+            });
+          },
+        ),
       ),
     );
   }
 
-  /// Build info cards (bus info, no buses, or waiting)
-  Widget _buildInfoCards(Map<String, BusData> displayBusData) {
-    Widget infoCard;
-
-    if (displayBusData.isNotEmpty) {
-      infoCard = BusInfoCard(
-        busData: displayBusData,
-        selectedRoute: selectedRoute,
-      );
-    } else if (busData.isNotEmpty) {
-      infoCard = NoBusesMessage(selectedRoute: selectedRoute);
-    } else {
-      infoCard = const WaitingForDataMessage();
+  Widget _buildRouteSelectorPanel() {
+    if (!_showRouteSelector) {
+      return const SizedBox.shrink();
     }
 
-    return Positioned(top: 10, right: 10, child: infoCard);
+    return Positioned(
+      top: 62,
+      left: 10,
+      child: Material(
+        color: Colors.white,
+        elevation: 5,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 220,
+          padding: const EdgeInsets.all(10),
+          child: RouteSelector(
+            selectedRoute: selectedRoute,
+            availableRoutes: availableRoutes,
+            onRouteChanged: (newRoute) {
+              setState(() {
+                selectedRoute = newRoute;
+                _showRouteSelector = false;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopPromptMessage() {
+    if (_selectedBusId != null) {
+      return const SizedBox.shrink();
+    }
+
+    const message = 'Select a bus on the map';
+
+    return Positioned(
+      top: 10,
+      left: 64,
+      right: 10,
+      child: Card(
+        elevation: 4,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Text(
+            message,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Build floating action buttons
