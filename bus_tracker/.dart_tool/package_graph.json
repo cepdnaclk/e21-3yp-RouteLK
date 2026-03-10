@@ -12,6 +12,7 @@
         "flutter",
         "flutter_map",
         "geolocator",
+        "http",
         "latlong2"
       ],
       "devDependencies": [
@@ -63,6 +64,16 @@
         "firebase_core_web",
         "flutter",
         "meta"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
       ]
     },
     {
@@ -247,6 +258,29 @@
       ]
     },
     {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner",
+        "typed_data"
+      ]
+    },
+    {
+      "name": "async",
+      "version": "2.13.0",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
+    },
+    {
       "name": "geolocator_windows",
       "version": "0.2.5",
       "dependencies": [
@@ -320,24 +354,6 @@
       "name": "logger",
       "version": "2.6.2",
       "dependencies": [
-        "meta"
-      ]
-    },
-    {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
-      "name": "async",
-      "version": "2.13.0",
-      "dependencies": [
-        "collection",
         "meta"
       ]
     },
@@ -433,9 +449,11 @@
       ]
     },
     {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
     },
     {
       "name": "uuid",
@@ -456,16 +474,6 @@
       "version": "2.0.0",
       "dependencies": [
         "unicode"
-      ]
-    },
-    {
-      "name": "http_parser",
-      "version": "4.1.2",
-      "dependencies": [
-        "collection",
-        "source_span",
-        "string_scanner",
-        "typed_data"
       ]
     },
     {
@@ -490,13 +498,6 @@
       "version": "0.3.1",
       "dependencies": [
         "lists"
-      ]
-    },
-    {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
       ]
     },
     {
