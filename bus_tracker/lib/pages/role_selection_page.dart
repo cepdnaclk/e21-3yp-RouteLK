@@ -4,7 +4,9 @@ import 'bus_registration_page.dart';
 import 'driver_home_page.dart';
 
 class RoleSelectionPage extends StatefulWidget {
-  const RoleSelectionPage({super.key});
+  final String? userName;
+
+  const RoleSelectionPage({super.key, this.userName});
 
   @override
   State<RoleSelectionPage> createState() => _RoleSelectionPageState();
@@ -12,8 +14,14 @@ class RoleSelectionPage extends StatefulWidget {
 
 class _RoleSelectionPageState extends State<RoleSelectionPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  late final TextEditingController _nameController;
   String? _selectedRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.userName);
+  }
 
   @override
   void dispose() {
@@ -43,13 +51,16 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         case 'Passenger':
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => PassengerHomePage()),
+            MaterialPageRoute(
+              builder: (_) => PassengerHomePage(userName: _nameController.text),
+            ),
           );
           break;
         case 'Driver':
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const DriverHomePage()),
+            MaterialPageRoute(
+                builder: (_) => DriverHomePage(userName: _nameController.text)),
           );
           break;
         case 'Bus Operator':

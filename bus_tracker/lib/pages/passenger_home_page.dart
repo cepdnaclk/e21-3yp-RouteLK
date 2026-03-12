@@ -1,73 +1,75 @@
 import 'package:flutter/material.dart';
 import 'bus_map_page.dart';
 import 'ac_bus_booking_page.dart';
-import '../widgets/route_selector.dart';
-import '../services/firebase_bus_service.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'driver_home_page.dart';
+import 'bus_registration_page.dart';
 
 class PassengerHomePage extends StatefulWidget {
-  const PassengerHomePage({super.key});
+  final String userName;
+
+  const PassengerHomePage({super.key, this.userName = 'Passenger'});
 
   @override
   State<PassengerHomePage> createState() => _PassengerHomePageState();
 }
 
 class _PassengerHomePageState extends State<PassengerHomePage> {
-  final FirebaseBusService _busService = FirebaseBusService();
-
-  String? _selectedRoute;
-  List<String> _availableRoutes = [];
-  bool _showRouteSelector = false; // only show after tapping tracking
-
-  @override
-  void initState() {
-    super.initState();
-    // listen for route updates so dropdown includes current database values
-    _busService.listenToBusLocations().listen((data) {
-      final routes = _busService.getAvailableRoutes(data);
-      setState(() {
-        _availableRoutes = routes;
-      });
-    }, onError: (e) => debugPrint('route listener error: $e'));
-  }
-
   void _navigateToMap() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BusMapPage(initialRoute: _selectedRoute),
+        builder: (_) => const BusMapPage(),
       ),
     );
   }
 
+  void _navigateToDriver() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DriverHomePage(userName: widget.userName)),
+    );
+  }
+
+  void _navigateToOperator() {
+    // Placeholder for Operator Page: Navigate to a simple scaffold or show a message
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(title: const Text("Operator Page")),
+          body: const Center(child: Text("Operator functionality coming soon")),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Passenger"),
-        backgroundColor: Color(0xFFfec205),
+        title: Text("Hi ${widget.userName}"),
+        backgroundColor: const Color(0xFFfec205),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("No new notifications")),
+              );
+            },
+          ),
+        ],
       ),
-
       body: Stack(
         children: [
           // background
           Positioned.fill(
-            child: FlutterMap(
-                options: MapOptions(
-                initialCenter: LatLng(7.2906, 80.6337), // Kandy center
-                initialZoom: 12,
-                ),
-                children: [
-                TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.bus_tracker',
-                ),
-                ],
+            child: Image.asset(
+              'assets/images/background.jpg',
+              fit: BoxFit.cover,
             ),
-         ),
+          ),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -75,70 +77,90 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Live Tracking Button
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.location_on),
-                    label: const Text(
-                      "Live Bus Tracking",
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFfec205),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 30,
+                  SizedBox(
+                    width: 300,
+                    height: 80,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.location_on),
+                      label: const Text(
+                        "Live Bus Tracking",
+                        style: TextStyle(fontSize: 24, color: Colors.black),
                       ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFfec205),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: _navigateToMap,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _showRouteSelector = true;
-                      });
-                    },
                   ),
-
-                  // only show selector after button pressed
-                  if (_showRouteSelector && _availableRoutes.isNotEmpty) ...[
-                    const SizedBox(height: 30),
-                    RouteSelector(
-                      selectedRoute: _selectedRoute,
-                      availableRoutes: _availableRoutes,
-                      onRouteChanged: (newRoute) {
-                        setState(() {
-                          _selectedRoute = newRoute;
-                        });
-                        if (newRoute != null) {
-                          _navigateToMap();
-                        }
-                      },
-                    ),
-                  ],
 
                   const SizedBox(height: 30),
 
                   // Seat Booking Button
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.event_seat),
-                    label: const Text(
-                      "Online Seat Booking",
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFfec205),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 30,
+                  SizedBox(
+                    width: 300,
+                    height: 80,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.event_seat),
+                      label: const Text(
+                        "Online Seat Booking",
+                        style: TextStyle(fontSize: 24, color: Colors.black),
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ACBusBookingPage(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFfec205),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                      );
-                    },
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ACBusBookingPage(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
+            ),
+          ),
+          
+          // Bottom Right Buttons (Driver & Operator)
+          Positioned(
+            bottom: 30,
+            right: 20,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 140,
+                  child: FloatingActionButton.extended(
+                    heroTag: "btnDriver",
+                    onPressed: _navigateToDriver,
+                    label: const Text("Driver"),
+                    icon: const Icon(Icons.drive_eta),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: 140,
+                  child: FloatingActionButton.extended(
+                    heroTag: "btnOperator",
+                    onPressed: _navigateToOperator,
+                    label: const Text("Operator"),
+                    icon: const Icon(Icons.admin_panel_settings),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
