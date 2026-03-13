@@ -85,6 +85,7 @@ class _SplashPageState extends State<SplashPage>
               ),
 
 
+<<<<<<< Updated upstream
               const SizedBox(height: 40),
 
               // Tagline
@@ -95,6 +96,18 @@ class _SplashPageState extends State<SplashPage>
                   color: Color(0xFF00458C),
                   letterSpacing: 1,
                   fontWeight: FontWeight.w700,
+=======
+                // Tagline
+                const Text(
+                  'Track Your Bus. Save Your Time.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF00458C),
+                    letterSpacing: 0.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+>>>>>>> Stashed changes
                 ),
               ),
             ],
