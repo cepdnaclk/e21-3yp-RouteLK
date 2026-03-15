@@ -89,18 +89,7 @@ class _BusMapPageState extends State<BusMapPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Bus Tracker - Real-time"),
-        backgroundColor: const Color(0xFFfec205),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("No new notifications")),
-              );
-            },
-          ),
-        ],
+        backgroundColor: Colors.deepOrange,
       ),
       body: myCurrentLocation == null
           ? const Center(child: CircularProgressIndicator())
@@ -155,7 +144,6 @@ class _BusMapPageState extends State<BusMapPage> {
     return Positioned(
       top: 10,
       left: 10,
-<<<<<<< Updated upstream
       child: RouteSelector(
         selectedRoute: selectedRoute,
         availableRoutes: availableRoutes,
@@ -164,22 +152,6 @@ class _BusMapPageState extends State<BusMapPage> {
             selectedRoute = newRoute;
           });
         },
-=======
-      child: Material(
-        color: const Color(0xFFfec205).withOpacity(0.95),
-        elevation: 3,
-        borderRadius: BorderRadius.circular(12),
-        child: IconButton(
-          tooltip: 'Select Route',
-          icon: const Icon(Icons.filter_list),
-          color: Colors.black,
-          onPressed: () {
-            setState(() {
-              _showRouteSelector = !_showRouteSelector;
-            });
-          },
-        ),
->>>>>>> Stashed changes
       ),
     );
   }
@@ -199,65 +171,11 @@ class _BusMapPageState extends State<BusMapPage> {
       infoCard = const WaitingForDataMessage();
     }
 
-<<<<<<< Updated upstream
     return Positioned(top: 10, right: 10, child: infoCard);
-=======
-    return Positioned(
-      top: 62,
-      left: 10,
-      child: Material(
-        color: Colors.white.withOpacity(0.85),
-        elevation: 5,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 220,
-          padding: const EdgeInsets.all(10),
-          child: RouteSelector(
-            selectedRoute: selectedRoute,
-            availableRoutes: availableRoutes,
-            onRouteChanged: (newRoute) {
-              setState(() {
-                selectedRoute = newRoute;
-                _showRouteSelector = false;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopPromptMessage() {
-    if (_selectedBusId != null) {
-      return const SizedBox.shrink();
-    }
-
-    const message = 'Select a bus on the map';
-
-    return Positioned(
-      top: 10,
-      left: 64,
-      right: 10,
-      child: Card(
-        elevation: 4,
-        color: Colors.yellow.shade100.withOpacity(0.85),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Text(
-            message,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-        ),
-      ),
-    );
->>>>>>> Stashed changes
   }
 
   /// Build floating action buttons
   Widget _buildFloatingButtons(Map<String, BusData> displayBusData) {
-    const appBarColor = Color(0xFFfec205);
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -267,16 +185,16 @@ class _BusMapPageState extends State<BusMapPage> {
             heroTag: 'viewAllBusesBtn',
             mini: true,
             onPressed: _viewAllBuses,
-            backgroundColor: appBarColor,
-            child: const Icon(Icons.directions_bus, color: Colors.black),
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.directions_bus),
           ),
         const SizedBox(height: 10),
         // Center on my location button
         FloatingActionButton(
           heroTag: 'myLocationBtn',
           onPressed: _centerOnMyLocation,
-          backgroundColor: appBarColor,
-          child: const Icon(Icons.my_location, color: Colors.black),
+          backgroundColor: Colors.deepOrange,
+          child: const Icon(Icons.my_location),
         ),
       ],
     );
