@@ -92,7 +92,7 @@ class _SplashPageState extends State<SplashPage>
                   'Track Your Bus. Save Your Time.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     color: Color(0xFF00458C),
                     letterSpacing: 0.5,
                     fontWeight: FontWeight.w600,
