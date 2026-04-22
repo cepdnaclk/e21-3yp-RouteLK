@@ -208,23 +208,28 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AC Bus Booking'),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFFfec205),
+        centerTitle: true,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade50, Colors.white],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // background
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/background.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+          Container(
+            color: Colors.transparent,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                 // 1. Select Route
                 _buildSectionTitle('1. Select Route'),
                 Card(
@@ -262,19 +267,19 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
                   ...availableBuses.map((bus) {
                     bool isSelected = _selectedBus == bus;
                     return Card(
-                      color: isSelected ? Colors.blue.shade100 : Colors.white,
+                      color: isSelected ? Colors.yellow.shade100 : Colors.white,
                       elevation: isSelected ? 4 : 1,
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                        side: isSelected ? const BorderSide(color: Colors.blue, width: 2) : BorderSide.none,
+                        side: isSelected ? const BorderSide(color: Color(0xFFfec205), width: 2) : BorderSide.none,
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.directions_bus, color: Colors.blue),
+                        leading: const Icon(Icons.directions_bus, color: Colors.black),
                         title: Text('${bus['time']} - ${bus['busNo']}', style: const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: const Text('AC Luxury Service'),
                         trailing: isSelected
-                            ? const Icon(Icons.check_circle, color: Colors.blue)
+                            ? const Icon(Icons.check_circle, color: Color(0xFFfec205))
                             : const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
                           setState(() {
@@ -300,7 +305,7 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                           children: [
-                            const Icon(Icons.calendar_today, color: Colors.blue),
+                            const Icon(Icons.calendar_today, color: Colors.black),
                             const SizedBox(width: 16),
                             Text(
                               _selectedDate == null
@@ -348,7 +353,7 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
+                              color: Colors.yellow.shade50,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -357,7 +362,7 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
                                 const Text('Total Seats: ', style: TextStyle(fontWeight: FontWeight.bold)),
                                 Text(
                                   '${_windowSeatsRequested + _normalSeatsRequested}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.blue),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFFfec205)),
                                 ),
                               ],
                             ),
@@ -417,10 +422,10 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFFfec205),
+                        foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                         elevation: 4,
                       ),
@@ -438,7 +443,9 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
           ),
         ),
       ),
-    );
+    ],
+  ),
+);
   }
 
   Widget _buildSectionTitle(String title) {
@@ -446,10 +453,10 @@ class _ACBusBookingPageState extends State<ACBusBookingPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.blue.shade800,
+          color: Colors.black,
         ),
       ),
     );

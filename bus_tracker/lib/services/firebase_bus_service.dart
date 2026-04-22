@@ -6,6 +6,42 @@ import '../models/bus_data.dart';
 class FirebaseBusService {
   final DatabaseReference _busesRef = FirebaseDatabase.instance.ref('buses');
 
+  bool _parseEmergencyValue(dynamic value) {
+    if (value is bool) {
+      return value;
+    }
+
+    if (value is num) {
+      return value != 0;
+    }
+
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized == 'true' || normalized == '1' || normalized == 'yes';
+    }
+
+    return false;
+  }
+
+  bool _extractEmergencyFlag(Map value) {
+    var hasEmergencyKey = false;
+    var isEmergency = false;
+
+    for (final entry in value.entries) {
+      final key = entry.key.toString().trim().toLowerCase();
+      if (key == 'emergency' || key.contains('emergency')) {
+        hasEmergencyKey = true;
+        isEmergency = isEmergency || _parseEmergencyValue(entry.value);
+      }
+    }
+
+    if (!hasEmergencyKey) {
+      return false;
+    }
+
+    return isEmergency;
+  }
+
   /// Listen to Firebase Realtime Database for bus data updates
   /// Expected Firebase structure:
   /// buses/
@@ -40,15 +76,20 @@ class FirebaseBusService {
 
               // Get route, default to 'Unknown' if not provided
               final route = (value['route'] as String?) ?? 'Unknown';
+              final emergency = _extractEmergencyFlag(value);
 
               busDataMap[key.toString()] = BusData(
                 location: LatLng(lat, lngDouble),
                 passengers: passengers,
                 route: route,
+                emergency: emergency,
               );
 
               print(
-                'Bus $key: $lat, $lngDouble, Passengers: $passengers, Route: $route',
+                'Bus $key: $lat, $lngDouble, Passengers: $passengers, Route: $route, Emergency: $emergency',
+              );
+              print(
+                'EMERGENCY_STATUS bus=$key emergency=$emergency rawEmergency=${value['Emergency']} rawemergency=${value['emergency']}',
               );
             } catch (e) {
               print('Error parsing bus $key: $e');
