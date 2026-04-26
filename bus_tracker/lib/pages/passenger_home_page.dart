@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'bus_map_page.dart';
 import 'ac_bus_booking_page.dart';
 import 'driver_home_page.dart';
-import 'bus_registration_page.dart';
 
 class PassengerHomePage extends StatefulWidget {
   final String userName;
@@ -17,16 +16,16 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
   void _navigateToMap() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const BusMapPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const BusMapPage()),
     );
   }
 
   void _navigateToDriver() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => DriverHomePage(userName: widget.userName)),
+      MaterialPageRoute(
+        builder: (_) => DriverHomePage(userName: widget.userName),
+      ),
     );
   }
 
@@ -128,7 +127,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
               ),
             ),
           ),
-          
+
           // Bottom Right Buttons (Driver & Operator)
           Positioned(
             bottom: 30,

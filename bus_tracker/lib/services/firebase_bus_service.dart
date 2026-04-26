@@ -5,6 +5,9 @@ import '../models/bus_data.dart';
 /// Service to handle Firebase Realtime Database operations for bus tracking
 class FirebaseBusService {
   final DatabaseReference _busesRef = FirebaseDatabase.instance.ref('buses');
+  final DatabaseReference _pickupRequestsRef = FirebaseDatabase.instance.ref(
+    'pickup_requests',
+  );
 
   bool _parseEmergencyValue(dynamic value) {
     if (value is bool) {
@@ -124,5 +127,54 @@ class FirebaseBusService {
     return Map.fromEntries(
       busData.entries.where((entry) => entry.value.route == selectedRoute),
     );
+  }
+
+  /// Save a passenger pickup request for a specific bus.
+  Future<void> createPickupRequest({
+    required String busId,
+    required LatLng location,
+    String? route,
+  }) async {
+    final requestRef = _pickupRequestsRef.child(busId).push();
+    await requestRef.set({
+      'latitude': location.latitude,
+      'longitude': location.longitude,
+      'route': route,
+      'status': 'pending',
+      'timestamp': ServerValue.timestamp,
+    });
+  }
+
+  /// Listen to pickup requests for a driver's bus.
+  Stream<Map<String, LatLng>> listenToPickupRequestsForBus(String busId) {
+    return _pickupRequestsRef.child(busId).onValue.map((event) {
+      final rawData = event.snapshot.value;
+      final pickupMap = <String, LatLng>{};
+
+      if (rawData is! Map) {
+        return pickupMap;
+      }
+
+      rawData.forEach((key, value) {
+        if (value is! Map) {
+          return;
+        }
+
+        try {
+          final lat = (value['latitude'] as num).toDouble();
+          final lng = (value['longitude'] as num).toDouble();
+          final status =
+              (value['status'] as String?)?.toLowerCase() ?? 'pending';
+
+          if (status != 'cancelled') {
+            pickupMap[key.toString()] = LatLng(lat, lng);
+          }
+        } catch (_) {
+          // Skip malformed pickup records.
+        }
+      });
+
+      return pickupMap;
+    });
   }
 }

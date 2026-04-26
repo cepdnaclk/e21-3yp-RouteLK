@@ -10,12 +10,21 @@ import '../services/open_route_service.dart';
 import '../widgets/bus_marker.dart';
 import '../utils/map_utils.dart';
 
+enum BusMapMode { passenger, driver }
+
 /// Main page displaying the bus tracking map
 class BusMapPage extends StatefulWidget {
   /// Optionally start the map with a specific route selected.
   final String? initialRoute;
+  final BusMapMode mode;
+  final String? driverBusId;
 
-  const BusMapPage({super.key, this.initialRoute});
+  const BusMapPage({
+    super.key,
+    this.initialRoute,
+    this.mode = BusMapMode.passenger,
+    this.driverBusId,
+  });
 
   @override
   State<BusMapPage> createState() => _BusMapPageState();
@@ -35,6 +44,7 @@ class _BusMapPageState extends State<BusMapPage> {
 
   StreamSubscription<Map<String, BusData>>? _busSubscription;
   StreamSubscription<LatLng>? _userLocationSubscription;
+  StreamSubscription<Map<String, LatLng>>? _pickupSubscription;
   Timer? _etaDebounceTimer;
 
   String? _selectedBusId;
@@ -57,12 +67,18 @@ class _BusMapPageState extends State<BusMapPage> {
   bool _showPickedBusMessage = false;
   String? _pickedBusId;
   Timer? _pickedBusMessageTimer;
+  Map<String, LatLng> _pickupLocations = {};
+  bool _isSavingPickupRequest = false;
 
   @override
   void initState() {
     super.initState();
     // respect any initialRoute passed from previous screen
     selectedRoute = widget.initialRoute;
+    if (widget.mode == BusMapMode.driver && widget.driverBusId != null) {
+      _selectedBusId = widget.driverBusId;
+      _listenToPickupRequests();
+    }
     _initializeLocation();
     _listenToUserLocation();
     _listenToBusLocations();
@@ -72,9 +88,36 @@ class _BusMapPageState extends State<BusMapPage> {
   void dispose() {
     _busSubscription?.cancel();
     _userLocationSubscription?.cancel();
+    _pickupSubscription?.cancel();
     _etaDebounceTimer?.cancel();
     _pickedBusMessageTimer?.cancel();
     super.dispose();
+  }
+
+  bool get _isDriverMode => widget.mode == BusMapMode.driver;
+
+  void _listenToPickupRequests() {
+    final driverBusId = widget.driverBusId;
+    if (driverBusId == null || driverBusId.isEmpty) {
+      return;
+    }
+
+    _pickupSubscription?.cancel();
+    _pickupSubscription = _busService
+        .listenToPickupRequestsForBus(driverBusId)
+        .listen(
+          (pickupData) {
+            if (!mounted) {
+              return;
+            }
+            setState(() {
+              _pickupLocations = pickupData;
+            });
+          },
+          onError: (error) {
+            debugPrint('Error listening to pickup requests: $error');
+          },
+        );
   }
 
   /// Initialize user's current location
@@ -111,6 +154,7 @@ class _BusMapPageState extends State<BusMapPage> {
   void _listenToBusLocations() {
     _busSubscription = _busService.listenToBusLocations().listen(
       (updatedBusData) {
+        final driverBusId = widget.driverBusId;
         final hasSelectedBus = _selectedBusId != null;
         final selectedStillExists =
             hasSelectedBus && updatedBusData.containsKey(_selectedBusId);
@@ -125,7 +169,11 @@ class _BusMapPageState extends State<BusMapPage> {
             selectedRoute = null;
           }
 
-          if (hasSelectedBus && !selectedStillExists) {
+          if (_isDriverMode && driverBusId != null && driverBusId.isNotEmpty) {
+            _selectedBusId = driverBusId;
+          }
+
+          if (!_isDriverMode && hasSelectedBus && !selectedStillExists) {
             _selectedBusId = null;
             _selectedBusEstimate = null;
             _estimateMessage = null;
@@ -185,6 +233,10 @@ class _BusMapPageState extends State<BusMapPage> {
   }
 
   void _onBusTapped(String busId) {
+    if (_isDriverMode) {
+      return;
+    }
+
     if (!mounted) {
       return;
     }
@@ -345,6 +397,10 @@ class _BusMapPageState extends State<BusMapPage> {
   }
 
   void _confirmMarkerAndFetchTraffic() {
+    if (_isDriverMode) {
+      return;
+    }
+
     if (_selectedBusId == null) {
       return;
     }
@@ -366,7 +422,7 @@ class _BusMapPageState extends State<BusMapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final displayBusData = filteredBusData;
+    final displayBusData = _displayBusDataForCurrentMode();
 
     return Scaffold(
       appBar: AppBar(
@@ -388,8 +444,26 @@ class _BusMapPageState extends State<BusMapPage> {
     );
   }
 
+  Map<String, BusData> _displayBusDataForCurrentMode() {
+    final routeFilteredBuses = filteredBusData;
+    if (!_isDriverMode) {
+      return routeFilteredBuses;
+    }
+
+    final driverBusId = widget.driverBusId;
+    if (driverBusId == null || !routeFilteredBuses.containsKey(driverBusId)) {
+      return {};
+    }
+
+    return {driverBusId: routeFilteredBuses[driverBusId]!};
+  }
+
   /// Build the map widget
   Widget _buildCenterBalloonMarker() {
+    if (_isDriverMode) {
+      return const SizedBox.shrink();
+    }
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -420,7 +494,7 @@ class _BusMapPageState extends State<BusMapPage> {
   }
 
   Widget _buildConfirmLocationButton() {
-    if (_showRouteSelector || _selectedBusId == null) {
+    if (_isDriverMode || _showRouteSelector || _selectedBusId == null) {
       return const SizedBox.shrink();
     }
 
@@ -504,7 +578,26 @@ class _BusMapPageState extends State<BusMapPage> {
                 (entry) => BusMarker.create(
                   entry.key,
                   entry.value,
-                  onTap: () => _onBusTapped(entry.key),
+                  onTap: _isDriverMode ? null : () => _onBusTapped(entry.key),
+                ),
+              ),
+            if (_isDriverMode && !_showRouteSelector)
+              ..._pickupLocations.values.map(
+                (location) => Marker(
+                  point: location,
+                  width: 54,
+                  height: 54,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_pin_circle,
+                      color: Colors.blue,
+                      size: 34,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -516,6 +609,10 @@ class _BusMapPageState extends State<BusMapPage> {
   Widget _buildSelectedBusEtaCard() {
     if (_showRouteSelector) {
       return const SizedBox.shrink();
+    }
+
+    if (_isDriverMode) {
+      return _buildDriverPickupCard();
     }
 
     final selectedBusId = _selectedBusId;
@@ -689,6 +786,75 @@ class _BusMapPageState extends State<BusMapPage> {
     );
   }
 
+  Widget _buildDriverPickupCard() {
+    final driverBusId = widget.driverBusId ?? 'your bus';
+    final pendingCount = _pickupLocations.length;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
+    return Positioned(
+      left: 12,
+      right: 12,
+      bottom: 10 + bottomInset,
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.directions_bus, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Driver view - $driverBusId',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.person_pin_circle,
+                      color: Colors.blue,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        pendingCount == 0
+                            ? 'No pickup requests yet for this bus'
+                            : '$pendingCount pickup request(s) are shown on the map',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildPickedBusMessage() {
     if (!_showPickedBusMessage || _pickedBusId == null) {
       return const SizedBox.shrink();
@@ -742,20 +908,59 @@ class _BusMapPageState extends State<BusMapPage> {
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: () {
-          _pickedBusMessageTimer?.cancel();
-          setState(() {
-            _pickedBusId = busId;
-            _showPickedBusMessage = true;
-          });
-          _pickedBusMessageTimer = Timer(const Duration(seconds: 2), () {
-            if (mounted) {
-              setState(() {
-                _showPickedBusMessage = false;
-              });
-            }
-          });
-        },
+        onTap: _isSavingPickupRequest
+            ? null
+            : () async {
+                final pickupLocation = _pendingStartLocation ?? _startLocation;
+                setState(() {
+                  _isSavingPickupRequest = true;
+                });
+
+                try {
+                  await _busService.createPickupRequest(
+                    busId: busId,
+                    location: pickupLocation,
+                    route: busData[busId]?.route,
+                  );
+
+                  if (!mounted) {
+                    return;
+                  }
+
+                  _pickedBusMessageTimer?.cancel();
+                  setState(() {
+                    _pickedBusId = busId;
+                    _showPickedBusMessage = true;
+                  });
+                  _pickedBusMessageTimer = Timer(
+                    const Duration(seconds: 2),
+                    () {
+                      if (mounted) {
+                        setState(() {
+                          _showPickedBusMessage = false;
+                        });
+                      }
+                    },
+                  );
+                } catch (e) {
+                  if (!mounted) {
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to send pickup location: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isSavingPickupRequest = false;
+                    });
+                  }
+                }
+              },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Column(
@@ -769,11 +974,17 @@ class _BusMapPageState extends State<BusMapPage> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(
-                    Icons.check_circle,
-                    size: 16,
-                    color: Colors.deepOrange,
-                  ),
+                  _isSavingPickupRequest
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(
+                          Icons.check_circle,
+                          size: 16,
+                          color: Colors.deepOrange,
+                        ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -837,6 +1048,10 @@ class _BusMapPageState extends State<BusMapPage> {
   }
 
   Widget _buildRouteMenuButton() {
+    if (_isDriverMode) {
+      return const SizedBox.shrink();
+    }
+
     return Positioned(
       top: 10,
       left: 10,

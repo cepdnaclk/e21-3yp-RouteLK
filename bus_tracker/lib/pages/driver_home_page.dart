@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'bus_map_page.dart';
 import 'passenger_home_page.dart';
 
@@ -14,19 +12,60 @@ class DriverHomePage extends StatefulWidget {
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-  void _navigateToMap() {
+  Future<void> _navigateToMap() async {
+    final busId = await _askDriverBusId();
+    if (!mounted || busId == null || busId.isEmpty) {
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const BusMapPage(),
+        builder: (_) => BusMapPage(mode: BusMapMode.driver, driverBusId: busId),
       ),
     );
+  }
+
+  Future<String?> _askDriverBusId() async {
+    final controller = TextEditingController(text: 'bus1');
+    final busId = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Enter Driver Bus ID'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Bus ID',
+              hintText: 'Example: bus1',
+            ),
+            textInputAction: TextInputAction.done,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text.trim());
+              },
+              child: const Text('Open Map'),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+    return busId;
   }
 
   void _navigateToPassenger() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => PassengerHomePage(userName: widget.userName)),
+      MaterialPageRoute(
+        builder: (_) => PassengerHomePage(userName: widget.userName),
+      ),
     );
   }
 
@@ -77,7 +116,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
               fit: BoxFit.cover,
             ),
           ),
-          
+
           // Center Content
           Center(
             child: Padding(
