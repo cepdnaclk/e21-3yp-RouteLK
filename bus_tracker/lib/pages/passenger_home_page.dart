@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bus_map_page.dart';
 import 'ac_bus_booking_page.dart';
-import 'driver_home_page.dart';
 
 class PassengerHomePage extends StatefulWidget {
   final String userName;
@@ -18,28 +17,6 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const BusMapPage()),
-    );
-  }
-
-  void _navigateToDriver() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DriverHomePage(userName: widget.userName),
-      ),
-    );
-  }
-
-  void _navigateToOperator() {
-    // Placeholder for Operator Page: Navigate to a simple scaffold or show a message
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text("Operator Page")),
-          body: const Center(child: Text("Operator functionality coming soon")),
-        ),
-      ),
     );
   }
 
@@ -326,137 +303,6 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 18),
-
-            // Creative role switcher
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Switch Role',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: _navigateToDriver,
-                              borderRadius: BorderRadius.circular(14),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: const Color(0xFFfec205),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFfec205),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.drive_eta,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      'Driver',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Track & manage buses',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: InkWell(
-                              onTap: _navigateToOperator,
-                              borderRadius: BorderRadius.circular(14),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: const Color(0xFFfec205),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFfec205),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.admin_panel_settings,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      'Bus Operator',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Fleet & route control',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
             const SizedBox(height: 18),
 
             const SizedBox(height: 30),

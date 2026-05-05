@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'role_selection_page.dart';
+import 'login_page.dart';
 
 /// Splash screen with app logo
 class SplashPage extends StatefulWidget {
@@ -32,12 +32,12 @@ class _SplashPageState extends State<SplashPage>
 
     _controller.forward();
 
-    // Navigate to role selection page after 3 seconds
+    // Navigate to login page after 3 seconds
     Timer(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
-        );
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginPage()));
       }
     });
   }
