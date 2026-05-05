@@ -60,7 +60,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (_) => DriverHomePage(userName: _nameController.text)),
+              builder: (_) => DriverHomePage(userName: _nameController.text),
+            ),
           );
           break;
         case 'Bus Operator':
@@ -219,62 +220,57 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
   }) {
     return GestureDetector(
       onTap: isSelected ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: const Color(0xFFfec205),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFfec205), width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24),
+      child: Card(
+        elevation: isSelected ? 8 : 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              // Icon
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
+                  color: isSelected
+                      ? const Color(0xFFfec205)
+                      : const Color(0xFF00458C),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: Icon(icon, size: 40, color: const Color(0xFF00458C)),
+                child: Icon(icon, size: 28, color: Colors.white),
               ),
 
-              const SizedBox(width: 20),
+              const SizedBox(width: 16),
 
-              // Text
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF00458C),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.grey.shade900,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF00458C),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Arrow or Loading
               if (isSelected)
                 const SizedBox(
                   height: 24,
@@ -287,10 +283,10 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
                   ),
                 )
               else
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios,
-                  color: Color(0xFF00458C),
-                  size: 24,
+                  color: Colors.grey.shade400,
+                  size: 20,
                 ),
             ],
           ),
