@@ -1,0 +1,25 @@
+ESP32 Pin Connections
+=====================
+
+1) Passenger Counter Module (IR sensors)
+- GPIO34 -> IR1 sensor input
+- GPIO32 -> IR2 sensor input
+
+1b) Ultrasonic Passenger Counter Module (separate)
+- GPIO5  -> Ultrasonic TOP TRIG
+- GPIO18 -> Ultrasonic TOP ECHO
+- GPIO19 -> Ultrasonic BOTTOM TRIG
+- GPIO21 -> Ultrasonic BOTTOM ECHO
+
+2) GPS Module (UART2)
+- GPIO16 -> GPS TX to ESP32 RX2
+- GPIO17 -> GPS RX from ESP32 TX2
+
+3) Emergency Button Module
+- GPIO25 -> Push button input (configured as INPUT_PULLUP)
+  Wiring note: connect button between GPIO25 and GND.
+
+Notes
+-----
+- Board: ESP32 DOIT DevKit V1
+- Pin usage extracted from source files in src/.
