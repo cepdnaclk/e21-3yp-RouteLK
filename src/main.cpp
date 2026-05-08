@@ -1,3 +1,6 @@
+#ifndef RUN_TESTS   // ← only compile real code when NOT testing
+
+
 #include <Arduino.h>
 #include "UltrasonicPassengerCounter.h"
 #include "WiFiConnect.h"
@@ -36,3 +39,5 @@ void loop() {
 
     delay(50); // small delay to avoid flooding Firebase
 }
+
+#endif  // RUN_TESTS

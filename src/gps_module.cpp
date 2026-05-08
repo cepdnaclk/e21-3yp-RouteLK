@@ -1,3 +1,5 @@
+#ifndef RUN_TESTS   // ← add this at the very top
+
 #include <Arduino.h>
 #include <TinyGPSPlus.h>
 #include "gps_module.h"
@@ -73,3 +75,5 @@ void updateGPS()
         Serial.println("------------------------\n");
     }
 }
+
+#endif  // ← add this at the very bottom
