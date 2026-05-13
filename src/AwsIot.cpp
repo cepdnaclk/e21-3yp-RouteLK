@@ -58,7 +58,7 @@ static bool publishJSON(const char* topic, const char* payload){
     }
     return ok;
 }
-
+/*
 bool publishPassengerCountAWS(int count){
     char payload[64];
     snprintf(payload, sizeof(payload), "{\"passengers\":%d}", count);
@@ -76,11 +76,11 @@ bool publishEmergencyAWS(bool status){
     snprintf(payload, sizeof(payload), "{\"emergency\":%s}", status ? "true" : "false");
     return publishJSON("buses/bus1/emergency", payload);
 }
-
+*/
 bool publishBusDataAWS(int passengers, double latitude, double longitude, bool emergency, double speed){
     char payload[256];
     // Build a JSON payload with all fields
-    snprintf(payload, sizeof(payload), "{\"passengers\":%d,\"latitude\":%.6f,\"longitude\":%.6f,\"emergency\":%s,\"speed_kmh\":%.2f}",
+    snprintf(payload, sizeof(payload), "{\"passengers\":%d,\"latitude\":%.6f,\"longitude\":%.6f,\"emergency\":%s,\"speed\":%.2f}",
              passengers, latitude, longitude, emergency ? "true" : "false", speed);
 
     // Publish to unified topic
