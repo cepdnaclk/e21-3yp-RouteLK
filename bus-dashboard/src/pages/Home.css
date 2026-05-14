@@ -143,3 +143,18 @@
   .promo-devices { flex-direction: column }
   .promo-device { width: 160px; height: 280px }
 }
+
+/* About page styles */
+.hd-about-hero { background: #fff; padding: 18px; border-radius: 8px; margin-bottom: 20px }
+.hd-about-hero-inner { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: center }
+.hd-about-hero-img { width: 100%; height: 260px; object-fit: cover; border-radius: 8px }
+.hd-about-hero-text h1 { margin: 0 0 8px 0 }
+.about-advantages { margin: 18px 0 }
+.about-advantages-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px }
+.about-adv-card { background: linear-gradient(180deg,#fff7d6,#fff2a8); padding: 18px; border-radius: 10px; box-shadow: 0 8px 22px rgba(15,23,42,0.04); text-align:left }
+.about-adv-title { font-weight:700; color:#0f172a }
+
+@media (max-width:900px) {
+  .hd-about-hero-inner { grid-template-columns: 1fr; }
+  .about-advantages-grid { grid-template-columns: 1fr }
+}

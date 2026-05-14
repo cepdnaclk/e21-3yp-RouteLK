@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Home from './pages/Home'
 import RegisteredBuses from './pages/RegisteredBuses'
+import About from './pages/About'
 import './App.css'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
+  if (route.startsWith('#/about')) return <About />
   if (route.startsWith('#/registered')) return <RegisteredBuses />
   return <Home />
 }

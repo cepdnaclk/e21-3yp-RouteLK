@@ -20,7 +20,7 @@ export default function RegisteredBuses() {
       <nav className="hd-tabs" aria-label="Primary">
         <a className="hd-tab" href="#/">Home</a>
         <a className="hd-tab" href="#/">Admin Dashboard</a>
-        <a className="hd-tab" href="#/">About Us</a>
+        <a className="hd-tab" href="#/about">About Us</a>
       </nav>
 
       <main className="hd-container">
