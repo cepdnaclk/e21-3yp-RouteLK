@@ -2,7 +2,7 @@ import React from 'react'
 import './Home.css'
 
 const sampleBuses = [
-  { plate: 'WP KA-1234', route: 'Peradeniya - Kandy', ownerId: 'OWN-001' },
+  { plate: 'WP KA-1234', route: 'Peradeniya - Gampola', ownerId: 'OWN-001' },
   { plate: 'WP PB-5678', route: 'Peradeniya - Kurunegala', ownerId: 'OWN-002' },
   { plate: 'WP LC-9012', route: 'Peradeniya - Matale', ownerId: 'OWN-003' },
 ]
