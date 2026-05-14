@@ -37,14 +37,14 @@
 .hd-hero-overlay p { margin: 6px 0 0 0; opacity: 0.95 }
 
 .hd-features { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin: 36px 0 }
-.hd-feature-card { background: linear-gradient(180deg,#fffaf0,#fff7cc); padding: 26px; border-radius: 10px; text-align:center; box-shadow: 0 6px 18px rgba(15,23,42,0.04); border: 1px solid rgba(249, 205, 77, 0.18) }
+.hd-feature-card { background: linear-gradient(180deg,#fff7d6,#fff2a8); padding: 26px; border-radius: 10px; text-align:center; box-shadow: 0 8px 22px rgba(15,23,42,0.06); border: 1px solid rgba(245,158,11,0.22) }
 .hd-feature-title { font-weight:700; font-size:18px; color:#0f172a }
 .hd-feature-desc { margin-top:8px; color:#6b7280 }
 
 .hd-about { background: white; padding: 20px; border-radius: 8px; margin: 28px 0 56px }
 
-.hd-about-grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: center }
-.hd-about-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px }
+.hd-about-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: center }
+.hd-about-img { width: 100%; max-width: 260px; height: auto; object-fit: cover; border-radius: 8px }
 .hd-about-text h3 { margin: 0 0 8px 0 }
 .hd-about-text h4 { margin: 12px 0 6px 0 }
 
