@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import './Home.css'
 
-// Bus and passenger related images (Unsplash)
-const images = [
-    'bus1.jpg',
-    'bus2.jpg',
-    'bus4.jpeg',
-  
-]
+// Local images moved to project-level `images/` folder
+import bus1 from '../../images/bus1.jpg'
+import bus2 from '../../images/bus2.jpg'
+import bus4 from '../../images/bus4.jpeg'
+import uop from '../../images/uop.jpg'
+
+const images = [bus1, bus2, bus4]
 
 export default function Home() {
   const [idx, setIdx] = useState(0)
@@ -62,7 +62,8 @@ export default function Home() {
           <h2>About Us</h2>
           <div className="hd-about-grid">
             <img
-              src="uop.jpg"
+              className="hd-about-img"
+              src={uop}
               alt="Team"
             />
             <div className="hd-about-text">
