@@ -6,6 +6,8 @@ import bus1 from '../../images/bus1.jpg'
 import bus2 from '../../images/bus2.jpg'
 import bus4 from '../../images/bus4.jpeg'
 import uop from '../../images/uop.jpg'
+import app1 from '../../images/app1.jpeg'
+import app2 from '../../images/app2.jpeg'
 
 const images = [bus1, bus2, bus4]
 
@@ -29,15 +31,15 @@ export default function Home() {
       <header className="hd-topbar">
         <div>
           <div className="hd-title">RouteLK</div>
-          <div className="hd-sub">Public Transit Operations</div>
+          <div className="hd-sub">Track your bus & save your time</div>
         </div>
       </header>
 
       <nav className="hd-tabs" aria-label="Primary">
-        <a className="hd-tab" href="#">Bus Registrations</a>
-        <a className="hd-tab" href="#">Admin Dashboard</a>
-        <a className="hd-tab" href="#">About Us</a>
-        <a className="hd-tab hd-tab-cta" href="#">Login</a>
+        <a className="hd-tab" href="#/registered">Bus Registrations</a>
+        <a className="hd-tab" href="#/">Admin Dashboard</a>
+        <a className="hd-tab" href="#/">About Us</a>
+        <a className="hd-tab hd-tab-cta" href="#/">Login</a>
       </nav>
 
       <main className="hd-container">
@@ -56,6 +58,33 @@ export default function Home() {
               <div className="hd-feature-desc">{f.desc}</div>
             </div>
           ))}
+        </section>
+
+        <section className="hd-promo-card">
+          <div className="hd-promo-inner">
+            <div className="promo-devices">
+              <div className="promo-device">
+                <img src={app1} alt="App preview 1" className="promo-device-img" />
+              </div>
+              <div className="promo-device">
+                <img src={app2} alt="App preview 2" className="promo-device-img" />
+              </div>
+            </div>
+            <div className="promo-content">
+              <h2>Get our app and make your life easy</h2>
+              <p>Download RouteLK and simplify your daily commute.</p>
+              <ul className="promo-features">
+                <li>Accurate ETA calculations for every stop</li>
+                <li>Book AC bus seats quickly and securely</li>
+                <li>Real-time emergency alerts for your bus</li>
+                <li>Live-tracked buses — pick the right bus and arrive on time</li>
+              </ul>
+              <div className="promo-cta">
+                <a className="btn primary" href="#">Get the App</a>
+                <a className="btn outline" href="#">Learn More</a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="hd-about">
