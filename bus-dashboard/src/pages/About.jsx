@@ -8,8 +8,7 @@ const advantages = [
   'Book AC bus seats quickly and securely',
   'Real-time emergency alerts and contacts',
   'Live-tracked buses with precise locations',
-  'In-app notifications for delays and route changes',
-  'Easy fare & ticket management'
+  'Real time crowd level of the bus',
 ]
 
 export default function About() {
@@ -24,9 +23,9 @@ export default function About() {
 
       <nav className="hd-tabs" aria-label="Primary">
         <a className="hd-tab" href="#/">Home</a>
-        <a className="hd-tab" href="#/registered">Bus Registrations</a>
-        <a className="hd-tab" href="#/about">About Us</a>
-        <a className="hd-tab hd-tab-cta" href="#/">Login</a>
+        <a className="hd-tab" href="#/registered">Registered Busses</a>
+        <a className="hd-tab" href="#/">Admin Dashboard</a>
+        
       </nav>
 
       <main className="hd-container">
@@ -35,15 +34,10 @@ export default function About() {
             <img src={aboutImg} alt="About" className="hd-about-hero-img" />
             <div className="hd-about-hero-text">
               <h1>RouteLK</h1>
-              <p>
-                
-                This project was developed to improve public transport systems in
-                Sri Lanka and provide safer, more reliable travel.
-
-              </p>
               <h3 style={{ marginTop: 14 }}>Our Mission</h3>
               <p>
-                To provide safe, reliable, and accessible transportation for people
+                This project was developed to improve public transport systems in
+                Sri Lanka and provide safer, more reliable travel. And to provide safe, reliable, and accessible transportation for people
                 across Sri Lanka by leveraging simple and effective digital tools.
               </p>
             </div>
@@ -51,7 +45,7 @@ export default function About() {
         </section>
 
         <section className="about-advantages">
-          <h2>Why RouteLK</h2>
+          <h2>What we provide</h2>
           <div className="about-advantages-grid">
             {advantages.map((a) => (
               <div className="about-adv-card" key={a}>
@@ -72,6 +66,16 @@ export default function About() {
                 improve public transport systems in Sri Lanka.
               </p>
             </div>
+          </div>
+        </section>
+        <section className="hd-contact" aria-label="Contact">
+          <div className="hd-contact-inner">
+            <h3>Contact Us</h3>
+            <p>
+              Email: <a href="mailto:info@routelk.lk">info@routelk.lk</a> | <a href="mailto:support@routelk.lk">support@routelk.lk</a>
+            </p>
+            <p>Phone: +94 77 123 4567</p>
+            <p>Address: University of Peradeniya, Peradeniya, Sri Lanka</p>
           </div>
         </section>
       </main>

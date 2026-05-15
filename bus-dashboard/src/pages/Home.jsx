@@ -36,7 +36,7 @@ export default function Home() {
       </header>
 
       <nav className="hd-tabs" aria-label="Primary">
-        <a className="hd-tab" href="#/registered">Bus Registrations</a>
+      <a className="hd-tab" href="#/registered">Registered Busses</a>
         <a className="hd-tab" href="#/">Admin Dashboard</a>
         <a className="hd-tab" href="#/about">About Us</a>
         <a className="hd-tab hd-tab-cta" href="#/">Login</a>
