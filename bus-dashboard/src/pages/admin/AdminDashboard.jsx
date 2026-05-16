@@ -33,9 +33,10 @@ export default function AdminDashboard() {
   else if (route.startsWith('#/admin/approved')) content = <ApprovedBuses />
   else if (route.startsWith('#/admin/analytics')) content = <Analytics />
   else content = (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>
       <h2>Welcome, {auth.name}</h2>
       <p>This is the admin area. Use the left menu to navigate admin functions.</p>
+      <img src="/images/about.png" alt="Welcome" style={{ maxWidth: '60%', height: 'auto', marginTop: 24, borderRadius: 8, boxShadow: '0 8px 24px rgba(2,6,23,0.12)' }} />
     </div>
   )
 
