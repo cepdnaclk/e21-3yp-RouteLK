@@ -6,11 +6,13 @@ class BusData {
   final LatLng location;
   final int passengers;
   final String route;
+  final bool emergency;
 
   BusData({
     required this.location,
     required this.passengers,
     required this.route,
+    this.emergency = false,
   });
 
   /// Determine occupancy level and return color

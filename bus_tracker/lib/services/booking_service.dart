@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class BookingService {
@@ -19,7 +18,7 @@ class BookingService {
     try {
       // Create a unique key for the booking
       final newBookingRef = _database.child('bookings').push();
-      
+
       await newBookingRef.set({
         'route': route,
         'busId': busId,
@@ -34,7 +33,7 @@ class BookingService {
         'timestamp': ServerValue.timestamp,
         'status': 'pending', // pending, confirmed, cancelled
       });
-      
+
       print('Booking created successfully: ${newBookingRef.key}');
     } catch (e) {
       print('Error creating booking: $e');

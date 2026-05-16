@@ -21,7 +21,7 @@ class BusInfoCard extends StatelessWidget {
           children: [
             _buildHeader(),
             const SizedBox(height: 6),
-            ...busData.entries.map(_buildBusItem).toList(),
+            ...busData.entries.map(_buildBusItem),
             const SizedBox(height: 6),
             _buildLegend(),
           ],
