@@ -24,8 +24,7 @@ export default function About() {
       <nav className="hd-tabs" aria-label="Primary">
         <a className="hd-tab" href="#/">Home</a>
         <a className="hd-tab" href="#/registered">Registered Busses</a>
-        <a className="hd-tab" href="#/">Admin Dashboard</a>
-        
+        <a className="hd-tab" href="#/login">Admin Dashboard</a>
       </nav>
 
       <main className="hd-container">
