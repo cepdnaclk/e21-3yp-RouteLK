@@ -31,9 +31,8 @@ export default function About() {
         <section className="hd-about-hero">
           <div className="hd-about-hero-inner">
             <img src={aboutImg} alt="About" className="hd-about-hero-img" />
-            <div className="hd-about-hero-text">
-              <h1>RouteLK</h1>
-              <h3 style={{ marginTop: 14 }}>Our Mission</h3>
+            <div className="hd-about-hero-text" style={{ alignSelf: 'start' }}>
+              <h1 style={{ marginBottom: 60 }}>RouteLK</h1>
               <p>
                 This project was developed to improve public transport systems in
                 Sri Lanka and provide safer, more reliable travel. And to provide safe, reliable, and accessible transportation for people

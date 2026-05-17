@@ -23,7 +23,7 @@ export default function Home() {
     { title: 'Bus Tracking', desc: 'Real-time location of buses on a map.' },
     { title: 'Estimate Arrival Time', desc: 'Accurate ETAs for each stop.' },
     { title: 'Easy Bus Booking', desc: 'Quick tickets and seat reservations.' },
-    { title: 'Know Emergencies', desc: 'Alerts and quick-response contacts.' },
+    { title: 'Know Emergencies and crowd levels', desc: 'Alerts and quick-response contacts.' },
   ]
 
   return (
