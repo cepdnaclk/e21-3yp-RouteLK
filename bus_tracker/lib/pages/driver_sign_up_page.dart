@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+
 import '../services/cognito_auth_service.dart';
 import 'confirm_sign_up_page.dart';
+import 'driver_home_page.dart';
 
-/// Professional user registration page - Name entry
-class UserRegistrationPage extends StatefulWidget {
-  const UserRegistrationPage({super.key});
+class DriverSignUpPage extends StatefulWidget {
+  const DriverSignUpPage({super.key});
 
   @override
-  State<UserRegistrationPage> createState() => _UserRegistrationPageState();
+  State<DriverSignUpPage> createState() => _DriverSignUpPageState();
 }
 
-class _UserRegistrationPageState extends State<UserRegistrationPage> {
+class _DriverSignUpPageState extends State<DriverSignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -34,7 +34,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     setState(() => _isLoading = true);
 
     try {
-      final auth = CognitoAuthService.passenger();
+      final auth = CognitoAuthService.driver();
       await auth.signUp(
         _emailController.text.trim(),
         _passwordController.text,
@@ -49,6 +49,9 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
             email: _emailController.text.trim(),
             displayName: _nameController.text.trim(),
             authService: auth,
+            nextPageBuilder: (_) => DriverHomePage(
+              userName: _nameController.text.trim(),
+            ),
           ),
         ),
       );
@@ -72,45 +75,45 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
-
-                // Back button (optional - can be removed if you don't want users to go back)
-                // IconButton(
-                //   icon: const Icon(Icons.arrow_back),
-                //   onPressed: () => Navigator.pop(context),
-                // ),
-
-                // Header section
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFfec205),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFfec205).withAlpha(77),
+                        blurRadius: 15,
+                        spreadRadius: 3,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.drive_eta, size: 50, color: Colors.black),
+                ),
+                const SizedBox(height: 30),
                 const Text(
-                  'Welcome to RouteLK',
+                  'Welcome Driver',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF00458C),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
-                const Text(
-                  'Please enter your details to create an account',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                  ),
+                Text(
+                  'Create your driver account to manage routes and trips',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 ),
-
-                const SizedBox(height: 50),
-
-                // Full Name field
+                const SizedBox(height: 40),
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
@@ -151,10 +154,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Email field
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -186,15 +186,16 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     fillColor: Colors.grey.shade50,
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Please enter your email';
-                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value.trim())) return 'Please enter a valid email';
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value.trim())) {
+                      return 'Please enter a valid email';
+                    }
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -226,23 +227,24 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     fillColor: Colors.grey.shade50,
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Please enter a password';
-                    if (value.length < 6) return 'Password must be at least 6 characters';
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Confirm password
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: true,
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    hintText: 'Confirm your password',
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    hintText: 'Re-enter your password',
+                    prefixIcon: const Icon(Icons.lock_reset_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.grey),
@@ -266,34 +268,16 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     fillColor: Colors.grey.shade50,
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Please confirm your password';
-                    if (value != _passwordController.text) return 'Passwords do not match';
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
-
-                const SizedBox(height: 12),
-                Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Already have an account? '),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const LoginPage()),
-                          );
-                        },
-                        child: const Text('Sign in'),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Spacer(),
-
-                // Continue button
+                const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -302,34 +286,28 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFfec205),
                       foregroundColor: const Color(0xFF00458C),
-                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      disabledBackgroundColor: Colors.grey.shade300,
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
                             width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF00458C),
-                              ),
+                              color: Color(0xFF00458C),
                             ),
                           )
                         : const Text(
-                            'Continue',
+                            'Create Driver Account',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                   ),
                 ),
-
-                const SizedBox(height: 40),
               ],
             ),
           ),

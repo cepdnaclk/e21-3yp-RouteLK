@@ -5,7 +5,16 @@ import 'passenger_home_page.dart';
 class ConfirmSignUpPage extends StatefulWidget {
   final String email;
   final String displayName;
-  const ConfirmSignUpPage({super.key, required this.email, required this.displayName});
+  final CognitoAuthService authService;
+  final WidgetBuilder? nextPageBuilder;
+
+  const ConfirmSignUpPage({
+    super.key,
+    required this.email,
+    required this.displayName,
+    required this.authService,
+    this.nextPageBuilder,
+  });
 
   @override
   State<ConfirmSignUpPage> createState() => _ConfirmSignUpPageState();
@@ -27,19 +36,19 @@ class _ConfirmSignUpPageState extends State<ConfirmSignUpPage> {
     setState(() => _isLoading = true);
 
     try {
-      final auth = CognitoAuthService();
-      final confirmed = await auth.confirmSignUp(
+      final confirmed = await widget.authService.confirmSignUp(
         widget.email,
         _codeController.text.trim(),
       );
 
       if (!mounted) return;
       if (confirmed == true) {
+        final nextPageBuilder = widget.nextPageBuilder ??
+            (_) => PassengerHomePage(userName: widget.displayName);
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => PassengerHomePage(userName: widget.displayName),
-          ),
+          MaterialPageRoute(builder: nextPageBuilder),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

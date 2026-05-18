@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'bus_registration_page.dart';
 import 'driver_home_page.dart';
+import 'driver_sign_in_page.dart';
+import 'driver_sign_up_page.dart';
+import 'bus_operator_sign_in_page.dart';
+import 'bus_operator_sign_up_page.dart';
 import 'login_page.dart';
 import 'passenger_home_page.dart';
 import 'user_registration_page.dart';
@@ -40,6 +44,22 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       return;
     }
 
+    if (role == 'Driver') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const DriverSignUpPage()),
+      );
+      return;
+    }
+
+    if (role == 'Bus Operator') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const BusOperatorSignUpPage()),
+      );
+      return;
+    }
+
     _openRoleDestination(role);
   }
 
@@ -51,6 +71,22 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+      return;
+    }
+
+    if (role == 'Driver') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const DriverSignInPage()),
+      );
+      return;
+    }
+
+    if (role == 'Bus Operator') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const BusOperatorSignInPage()),
       );
       return;
     }
@@ -147,56 +183,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
 
               const SizedBox(height: 22),
 
-              if (selectedRole != null && selectedRole != 'Passenger') ...[
-                TextFormField(
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'Enter your name',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () => _openRoleDestination(selectedRole),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFfec205),
-                      foregroundColor: const Color(0xFF00458C),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-
-              if (selectedRole == 'Passenger') ...[
+              if (selectedRole == 'Passenger' || selectedRole == 'Driver' || selectedRole == 'Bus Operator') ...[
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
@@ -237,7 +224,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Passenger accounts use AWS Cognito authentication.',
+                  'Passenger, driver, and bus operator accounts use AWS Cognito authentication.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey),
                 ),

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'passenger_home_page.dart';
-import '../services/cognito_auth_service.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../services/cognito_auth_service.dart';
+import 'driver_home_page.dart';
+
+class DriverSignInPage extends StatefulWidget {
+  const DriverSignInPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<DriverSignInPage> createState() => _DriverSignInPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _DriverSignInPageState extends State<DriverSignInPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -36,16 +37,17 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final auth = CognitoAuthService.passenger();
+      final auth = CognitoAuthService.driver();
       final session = await auth.signIn(
         _emailController.text.trim(),
         _passwordController.text,
       );
       if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => PassengerHomePage(
+          builder: (_) => DriverHomePage(
             userName: auth.getDisplayNameFromSession(
               session,
               _emailController.text.trim(),
@@ -80,7 +82,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo / Icon
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -94,14 +95,11 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.login, size: 50, color: Colors.black),
+                  child: const Icon(Icons.drive_eta_outlined, size: 50, color: Colors.black),
                 ),
-
                 const SizedBox(height: 30),
-
-                // Welcome text
                 const Text(
-                  'Welcome to RouteLK',
+                  'Driver Sign In',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
@@ -109,18 +107,13 @@ class _LoginPageState extends State<LoginPage> {
                     color: Color(0xFF00458C),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 Text(
-                  'Sign in with your email and password',
+                  'Sign in with your driver account credentials',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Email field
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -155,17 +148,13 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email';
                     }
-                    final email = value.trim();
-                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(email)) {
+                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value.trim())) {
                       return 'Please enter a valid email address';
                     }
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -175,9 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Enter your password',
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      ),
+                      icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
@@ -214,10 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
-
-                const SizedBox(height: 20),
-
-                // Sign in button
+                const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -226,34 +210,25 @@ class _LoginPageState extends State<LoginPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFfec205),
                       foregroundColor: const Color(0xFF00458C),
-                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      disabledBackgroundColor: Colors.grey.shade300,
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
                             width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF00458C),
-                              ),
+                              color: Color(0xFF00458C),
                             ),
                           )
                         : const Text(
-                            'Sign in',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            'Sign In as Driver',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
               ],
             ),
           ),

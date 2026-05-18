@@ -14,6 +14,21 @@ class DriverHomePage extends StatefulWidget {
 class _DriverHomePageState extends State<DriverHomePage> {
   int _selectedIndex = 0;
 
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning!';
+    }
+    if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon!';
+    }
+    if (hour >= 17 && hour < 21) {
+      return 'Good Evening!';
+    }
+    return 'Good Evening!';
+  }
+
   Future<void> _navigateToMap() async {
     final busId = await _askDriverBusId();
     if (!mounted || busId == null || busId.isEmpty) {
@@ -72,6 +87,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,7 +113,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Good Afternoon!',
+                    _getTimeBasedGreeting(),
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade900),
                   ),
                 ],
@@ -230,7 +246,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 22),
           ],
         ),
       ),
@@ -263,56 +278,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _featureBar(IconData icon, String label) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFfec205),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.black, size: 20),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-        ),
-      ],
-    );
-  }
-
-  Widget _aboutRow(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFfec205).withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 18, color: const Color(0xFF00458C)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade800,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

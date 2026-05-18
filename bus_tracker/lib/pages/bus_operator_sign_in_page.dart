@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'passenger_home_page.dart';
-import '../services/cognito_auth_service.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../services/cognito_auth_service.dart';
+import 'bus_registration_page.dart';
+
+class BusOperatorSignInPage extends StatefulWidget {
+  const BusOperatorSignInPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<BusOperatorSignInPage> createState() => _BusOperatorSignInPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _BusOperatorSignInPageState extends State<BusOperatorSignInPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -36,22 +37,13 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final auth = CognitoAuthService.passenger();
-      final session = await auth.signIn(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      final auth = CognitoAuthService.busOperator();
+      await auth.signIn(_emailController.text.trim(), _passwordController.text);
       if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => PassengerHomePage(
-            userName: auth.getDisplayNameFromSession(
-              session,
-              _emailController.text.trim(),
-            ),
-          ),
-        ),
+        MaterialPageRoute(builder: (_) => const BusRegistrationPage()),
       );
     } catch (e) {
       if (!mounted) return;
@@ -80,28 +72,24 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo / Icon
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFfec205),
+                    color: const Color(0xFFF97316),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFfec205).withAlpha(77),
+                        color: const Color(0xFFF97316).withAlpha(77),
                         blurRadius: 15,
                         spreadRadius: 3,
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.login, size: 50, color: Colors.black),
+                  child: const Icon(Icons.directions_bus_outlined, size: 50, color: Colors.white),
                 ),
-
                 const SizedBox(height: 30),
-
-                // Welcome text
                 const Text(
-                  'Welcome to RouteLK',
+                  'Bus Operator Sign In',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
@@ -109,18 +97,13 @@ class _LoginPageState extends State<LoginPage> {
                     color: Color(0xFF00458C),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 Text(
-                  'Sign in with your email and password',
+                  'Sign in with your bus operator credentials',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Email field
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -140,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
+                        color: Color(0xFFF97316),
                         width: 2,
                       ),
                     ),
@@ -155,17 +138,13 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email';
                     }
-                    final email = value.trim();
-                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(email)) {
+                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value.trim())) {
                       return 'Please enter a valid email address';
                     }
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -175,9 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Enter your password',
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      ),
+                      icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
@@ -193,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
+                        color: Color(0xFFF97316),
                         width: 2,
                       ),
                     ),
@@ -214,46 +191,34 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
-
-                const SizedBox(height: 20),
-
-                // Sign in button
+                const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFfec205),
-                      foregroundColor: const Color(0xFF00458C),
-                      elevation: 0,
+                      backgroundColor: const Color(0xFFF97316),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      disabledBackgroundColor: Colors.grey.shade300,
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
                             width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF00458C),
-                              ),
+                              color: Colors.white,
                             ),
                           )
                         : const Text(
-                            'Sign in',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            'Sign In as Bus Operator',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
               ],
             ),
           ),
