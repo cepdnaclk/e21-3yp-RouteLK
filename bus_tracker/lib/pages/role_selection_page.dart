@@ -1,76 +1,29 @@
 import 'package:flutter/material.dart';
-import 'passenger_home_page.dart';
-import 'bus_registration_page.dart';
-import 'driver_home_page.dart';
+import 'otp_verification_page.dart';
 
 class RoleSelectionPage extends StatefulWidget {
-  final String? userName;
-
-  const RoleSelectionPage({super.key, this.userName});
+  const RoleSelectionPage({super.key});
 
   @override
   State<RoleSelectionPage> createState() => _RoleSelectionPageState();
 }
 
 class _RoleSelectionPageState extends State<RoleSelectionPage> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
   String? _selectedRole;
 
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.userName);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  void _navigateToRole(String role) {
-    // Validate name before proceeding
-    if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your name first'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
+  void _navigateToOtpPage(String role) {
     setState(() => _selectedRole = role);
 
     // Small delay for visual feedback before navigation
     Future.delayed(const Duration(milliseconds: 300), () {
       if (!mounted) return;
 
-      switch (role) {
-        case 'Passenger':
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PassengerHomePage(userName: _nameController.text),
-            ),
-          );
-          break;
-        case 'Driver':
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DriverHomePage(userName: _nameController.text),
-            ),
-          );
-          break;
-        case 'Bus Operator':
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const BusRegistrationPage()),
-          );
-          break;
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationPage(selectedRole: role),
+        ),
+      );
     });
   }
 
@@ -81,130 +34,78 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
 
-                // Welcome message
-                const Text(
-                  'Welcome to RouteLK',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00458C),
-                  ),
+              // Welcome message
+              const Text(
+                'Welcome to RouteLK',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF00458C),
                 ),
+              ),
 
-                const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-                const Text(
-                  'Enter your name and select your role',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                  ),
+              const Text(
+                'Select your role to continue',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w400,
                 ),
+              ),
 
-                const SizedBox(height: 30),
+              const SizedBox(height: 50),
 
-                // Name input field
-                TextFormField(
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'Enter your name',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
+              // Section label
+              const Text(
+                'Choose Your Role',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF00458C),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Role cards
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildRoleCard(
+                      title: 'Passenger',
+                      subtitle: 'Track and book bus rides',
+                      icon: Icons.person_outline,
+                      isSelected: _selectedRole == 'Passenger',
+                      onTap: () => _navigateToOtpPage('Passenger'),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    const SizedBox(height: 20),
+                    _buildRoleCard(
+                      title: 'Driver',
+                      subtitle: 'Drive and manage your routes',
+                      icon: Icons.drive_eta_outlined,
+                      isSelected: _selectedRole == 'Driver',
+                      onTap: () => _navigateToOtpPage('Driver'),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
+                    const SizedBox(height: 20),
+                    _buildRoleCard(
+                      title: 'Bus Operator',
+                      subtitle: 'Manage your fleet and operations',
+                      icon: Icons.directions_bus_outlined,
+                      isSelected: _selectedRole == 'Bus Operator',
+                      onTap: () => _navigateToOtpPage('Bus Operator'),
                     ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    if (value.trim().length < 2) {
-                      return 'Name must be at least 2 characters';
-                    }
-                    return null;
-                  },
+                  ],
                 ),
-
-                const SizedBox(height: 30),
-
-                // Section label
-                const Text(
-                  'Select Your Role',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF00458C),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Role cards
-                Expanded(
-                  child: ListView(
-                    children: [
-                      _buildRoleCard(
-                        title: 'Passenger',
-                        subtitle: 'Track and book bus rides',
-                        icon: Icons.person_outline,
-                        isSelected: _selectedRole == 'Passenger',
-                        onTap: () => _navigateToRole('Passenger'),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      _buildRoleCard(
-                        title: 'Driver',
-                        subtitle: 'Drive and manage your routes',
-                        icon: Icons.drive_eta_outlined,
-                        isSelected: _selectedRole == 'Driver',
-                        onTap: () => _navigateToRole('Driver'),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      _buildRoleCard(
-                        title: 'Bus Operator',
-                        subtitle: 'Manage your fleet and operations',
-                        icon: Icons.directions_bus_outlined,
-                        isSelected: _selectedRole == 'Bus Operator',
-                        onTap: () => _navigateToRole('Bus Operator'),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),

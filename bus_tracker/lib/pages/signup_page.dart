@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'role_selection_page.dart';
+import 'passenger_home_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
   bool _obscurePassword = true;
@@ -20,14 +21,16 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -51,21 +54,27 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
-    // Simulate login delay
+    // Simulate account creation delay
     Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
 
-      // Navigate to role selection with username
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) =>
-              RoleSelectionPage(userName: _nameController.text.trim()),
-        ),
-      );
-
-      setState(() => _isLoading = false);
+      _navigateToPassengerHome();
     });
+  }
+
+  void _navigateToPassengerHome() {
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PassengerHomePage(
+          userName: '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
+        ),
+      ),
+    );
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -120,14 +129,14 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 40),
 
-                // Name field
+                // First Name field
                 TextFormField(
-                  controller: _nameController,
+                  controller: _firstNameController,
                   textCapitalization: TextCapitalization.words,
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    hintText: 'Enter your full name',
+                    labelText: 'First Name',
+                    hintText: 'Enter your first name',
                     prefixIcon: const Icon(Icons.person_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -153,10 +162,54 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your name';
+                      return 'Please enter your first name';
                     }
                     if (value.trim().length < 2) {
-                      return 'Name must be at least 2 characters';
+                      return 'First name must be at least 2 characters';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                // Last Name field
+                TextFormField(
+                  controller: _lastNameController,
+                  textCapitalization: TextCapitalization.words,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    hintText: 'Enter your last name',
+                    prefixIcon: const Icon(Icons.person_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFfec205),
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your last name';
+                    }
+                    if (value.trim().length < 2) {
+                      return 'Last name must be at least 2 characters';
                     }
                     return null;
                   },
@@ -297,7 +350,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           )
                         : const Text(
-                            'Login & Select Role',
+                            'Create Account',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
