@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/cognito_auth_service.dart';
 import 'passenger_home_page.dart';
@@ -23,11 +24,62 @@ class ConfirmSignUpPage extends StatefulWidget {
 class _ConfirmSignUpPageState extends State<ConfirmSignUpPage> {
   final _codeController = TextEditingController();
   bool _isLoading = false;
+  int _expiryRemaining = 0; // seconds remaining until code expires
+  Timer? _resendTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startResendCooldown(420); // start 7-minute countdown when page opens
+  }
 
   @override
   void dispose() {
     _codeController.dispose();
+    _resendTimer?.cancel();
     super.dispose();
+  }
+
+  void _startResendCooldown([int seconds = 420]) {
+    _resendTimer?.cancel();
+    setState(() => _expiryRemaining = seconds);
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() {
+        _expiryRemaining -= 1;
+        if (_expiryRemaining <= 0) {
+          _expiryRemaining = 0;
+          _resendTimer?.cancel();
+        }
+      });
+    });
+  }
+
+  Future<void> _resendCode() async {
+    if (_expiryRemaining > 0) return; // only allow resend after expiry
+
+    setState(() => _isLoading = true);
+    try {
+      await widget.authService.resendConfirmationCode(widget.email);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Confirmation code resent.')),
+      );
+      // restart 7-minute window after resending
+      _startResendCooldown(420);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to resend code: ${e.toString()}'), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  String _formatTime(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   Future<void> _confirm() async {
@@ -84,7 +136,12 @@ class _ConfirmSignUpPageState extends State<ConfirmSignUpPage> {
           children: [
             const SizedBox(height: 24),
             Text('A confirmation code was sent to ${widget.email}.'),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Text(
+              'If you do not see the email in your inbox, please check your spam or junk folder. Confirmation codes are time-limited; if yours expired you can request a new code.',
+              style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _codeController,
               decoration: const InputDecoration(labelText: 'Confirmation code'),
@@ -95,6 +152,22 @@ class _ConfirmSignUpPageState extends State<ConfirmSignUpPage> {
               onPressed: _isLoading ? null : _confirm,
               child: _isLoading ? const CircularProgressIndicator() : const Text('Confirm'),
             ),
+            const SizedBox(height: 8),
+            if (_expiryRemaining > 0) ...[
+              Center(
+                child: Text(
+                  'Code expires in ${_formatTime(_expiryRemaining)}',
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                ),
+              ),
+            ] else ...[
+              Center(
+                child: TextButton(
+                  onPressed: _isLoading ? null : _resendCode,
+                  child: const Text('Resend code'),
+                ),
+              ),
+            ],
           ],
         ),
       ),

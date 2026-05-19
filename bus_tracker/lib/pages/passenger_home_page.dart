@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'bus_map_page.dart';
 import 'ac_bus_booking_page.dart';
+import 'account_page.dart';
+import 'role_selection_page.dart';
 
 class PassengerHomePage extends StatefulWidget {
   final String userName;
+  final String userEmail;
 
-  const PassengerHomePage({super.key, this.userName = 'Passenger'});
+  const PassengerHomePage({
+    super.key,
+    this.userName = 'Passenger',
+    this.userEmail = '',
+  });
 
   @override
   State<PassengerHomePage> createState() => _PassengerHomePageState();
@@ -117,6 +124,28 @@ class _PassengerHomePageState extends State<PassengerHomePage>
     );
   }
 
+  void _openAccount() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AccountPage(
+          role: 'Passenger',
+          email: widget.userEmail,
+          userName: widget.userName,
+          onLogout: _logout,
+        ),
+      ),
+    );
+  }
+
+  void _logout() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,6 +192,22 @@ class _PassengerHomePageState extends State<PassengerHomePage>
                         ),
                         const SizedBox(height: 12),
                       ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _openAccount,
+                    child: Container(
+                      height: 44,
+                      width: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.account_circle,
+                        size: 30,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
                 ],

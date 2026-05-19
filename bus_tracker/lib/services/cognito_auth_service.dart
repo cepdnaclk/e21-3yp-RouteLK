@@ -54,6 +54,36 @@ class CognitoAuthService {
     return session;
   }
 
+  /// Update the user's display name in Cognito.
+  Future<void> updateDisplayName(String email, String currentPassword, String newName) async {
+    final cognitoUser = CognitoUser(email, userPool);
+    final authDetails = AuthenticationDetails(username: email, password: currentPassword);
+    await cognitoUser.authenticateUser(authDetails);
+    await cognitoUser.updateAttributes([CognitoUserAttribute(name: 'given_name', value: newName)]);
+  }
+
+  /// Change the signed-in user's password.
+  Future<void> changePassword(String email, String currentPassword, String newPassword) async {
+    final cognitoUser = CognitoUser(email, userPool);
+    final authDetails = AuthenticationDetails(username: email, password: currentPassword);
+    await cognitoUser.authenticateUser(authDetails);
+    await cognitoUser.changePassword(currentPassword, newPassword);
+  }
+
+  /// Delete the signed-in user's account.
+  Future<void> deleteAccount(String email, String currentPassword) async {
+    final cognitoUser = CognitoUser(email, userPool);
+    final authDetails = AuthenticationDetails(username: email, password: currentPassword);
+    await cognitoUser.authenticateUser(authDetails);
+    await cognitoUser.deleteUser();
+  }
+
+  /// Resend the confirmation code (OTP) to the user's email.
+  Future<void> resendConfirmationCode(String email) async {
+    final cognitoUser = CognitoUser(email, userPool);
+    await cognitoUser.resendConfirmationCode();
+  }
+
   /// Extract the signed-in user's display name from the ID token claims.
   String getDisplayNameFromSession(CognitoUserSession? session, String fallback) {
     if (session == null) {

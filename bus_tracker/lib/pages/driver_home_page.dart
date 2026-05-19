@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'bus_map_page.dart';
 import 'passenger_home_page.dart';
+import 'account_page.dart';
+import 'role_selection_page.dart';
 
 class DriverHomePage extends StatefulWidget {
   final String userName;
+  final String userEmail;
 
-  const DriverHomePage({super.key, this.userName = 'Driver'});
+  const DriverHomePage({
+    super.key,
+    this.userName = 'Driver',
+    this.userEmail = '',
+  });
 
   @override
   State<DriverHomePage> createState() => _DriverHomePageState();
@@ -84,6 +91,28 @@ class _DriverHomePageState extends State<DriverHomePage> {
     );
   }
 
+  void _openAccount() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AccountPage(
+          role: 'Driver',
+          email: widget.userEmail,
+          userName: widget.userName,
+          onLogout: _logout,
+        ),
+      ),
+    );
+  }
+
+  void _logout() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,20 +130,43 @@ class _DriverHomePageState extends State<DriverHomePage> {
                   bottomRight: Radius.circular(18),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    'Hi ${widget.userName},',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hi ${widget.userName},',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _getTimeBasedGreeting(),
+                          style: TextStyle(fontSize: 14, color: Colors.grey.shade900),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _getTimeBasedGreeting(),
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade900),
+                  GestureDetector(
+                    onTap: _openAccount,
+                    child: Container(
+                      height: 44,
+                      width: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.account_circle,
+                        size: 30,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
                 ],
               ),
