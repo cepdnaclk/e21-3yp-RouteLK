@@ -3,10 +3,10 @@
 ---
 
 ## Team
--  E/21/017, Thimal Adeesha, [e21017@eng.pdn.ac.lk](mailto:name@email.com)
--  E/21/126, Dinithi Epitakaduwa, [e21126@eng.pdn.ac.lk](mailto:name@email.com)
--  E/21/372, Lakshika Seneviratne, [e21372@eng.pdn.ac.lk](mailto:name@email.com)
--  E/21/391, Walter Ravindu, [e21391@eng.pdn.ac.lk](mailto:name@email.com)
+-  E/21/017, Thimal Adeesha, [e21017@eng.pdn.ac.lk](mailto:e21017@eng.pdn.ac.lk)
+-  E/21/126, Dinithi Epitakaduwa, [e21126@eng.pdn.ac.lk](mailto:e21126@eng.pdn.ac.lk)
+-  E/21/372, Lakshika Seneviratne, [e21372@eng.pdn.ac.lk](mailto:e21372@eng.pdn.ac.lk)
+-  E/21/391, Walter Ravindu, [e21391@eng.pdn.ac.lk](mailto:e21391@eng.pdn.ac.lk)
 
 <!-- Image (photo/drawing of the final hardware) should be here -->
 
