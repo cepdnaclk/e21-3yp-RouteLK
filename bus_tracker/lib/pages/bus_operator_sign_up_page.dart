@@ -91,17 +91,17 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF97316),
+                    color: const Color(0xFFfec205),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFF97316).withAlpha(77),
+                        color: const Color(0xFFfec205).withAlpha(77),
                         blurRadius: 15,
                         spreadRadius: 3,
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.directions_bus, size: 50, color: Colors.white),
+                  child: const Icon(Icons.directions_bus, size: 50, color: Colors.black),
                 ),
                 const SizedBox(height: 30),
                 const Text(
@@ -139,7 +139,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFF97316),
+                        color: Color(0xFFfec205),
                         width: 2,
                       ),
                     ),
@@ -180,7 +180,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFF97316),
+                        color: Color(0xFFfec205),
                         width: 2,
                       ),
                     ),
@@ -221,7 +221,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFF97316),
+                        color: Color(0xFFfec205),
                         width: 2,
                       ),
                     ),
@@ -262,7 +262,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Color(0xFFF97316),
+                        color: Color(0xFFfec205),
                         width: 2,
                       ),
                     ),
@@ -290,8 +290,8 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _continue,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF97316),
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFfec205),
+                      foregroundColor: const Color(0xFF00458C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -302,7 +302,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: Colors.white,
+                              color: Color(0xFF00458C),
                             ),
                           )
                         : const Text(
