@@ -41,7 +41,7 @@ This system demonstrates how IoT and cloud technologies can modernize public tra
 ## Solution Architecture
 
 ### High Level Architecture Diagram
-
+![System Architecture](docs/images/architecture.png)
 
 ### Edge Layer (Bus Device):
 An ESP32 board connected with peripheral components installed inside the bus collects passenger counts using IR sensors and tracks GPS location. Data is packaged in JSON format and stored locally if internet connectivity fails.
