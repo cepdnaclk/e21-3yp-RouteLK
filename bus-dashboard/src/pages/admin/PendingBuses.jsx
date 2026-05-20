@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { getPendingBuses, approveBus, rejectBus } from '../../api'
 
 function ensureSampleData() {
   const existing = JSON.parse(localStorage.getItem('buses') || 'null')
@@ -18,18 +19,49 @@ export default function PendingBuses() {
   const [buses, setBuses] = useState([])
 
   useEffect(() => {
-    ensureSampleData()
-    setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+    let mounted = true
+    async function load() {
+      try {
+        const data = await getPendingBuses()
+        const list = Array.isArray(data) ? data : (data && data.buses) || []
+        if (mounted) {
+          setBuses(list)
+        }
+        return
+      } catch (e) {
+        // fallback to local sample data below
+      }
+      ensureSampleData()
+      if (mounted) setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+    }
+    load()
+    return () => { mounted = false }
   }, [])
 
-  const refresh = () => setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+  const refresh = async () => {
+    try {
+      const data = await getPendingBuses()
+      const list = Array.isArray(data) ? data : (data && data.buses) || []
+      return setBuses(list)
+    } catch (e) {
+      // ignore and fallback
+    }
+    setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+  }
 
-  const approve = (id) => {
-    const all = JSON.parse(localStorage.getItem('buses') || '[]')
-    const idx = all.findIndex((b) => b.id === id)
-    if (idx === -1) return
-    all[idx].status = 'approved'
-    localStorage.setItem('buses', JSON.stringify(all))
+  const approve = async (bus) => {
+    const id = bus.bus_id || bus.id || bus._id
+    try {
+      await approveBus(id)
+    } catch (e) {
+      // if API fails, update local storage as fallback
+      const all = JSON.parse(localStorage.getItem('buses') || '[]')
+      const idx = all.findIndex((b) => (b.id === id) || (b.bus_id === id))
+      if (idx !== -1) {
+        all[idx].status = 'approved'
+        localStorage.setItem('buses', JSON.stringify(all))
+      }
+    }
     refresh()
   }
 

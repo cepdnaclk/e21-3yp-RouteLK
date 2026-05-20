@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from 'react'
+import { getApprovedBuses } from '../../api'
 
 export default function ApprovedBuses() {
   const [buses, setBuses] = useState([])
 
   useEffect(() => {
-    setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+    let mounted = true
+    async function load() {
+      try {
+        const data = await getApprovedBuses()
+        const list = Array.isArray(data) ? data : (data && data.buses) || []
+        if (mounted) return setBuses(list)
+      } catch (e) {
+        // fallback to local storage
+      }
+      if (mounted) setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+    }
+    load()
+    return () => { mounted = false }
   }, [])
 
   const remove = (id) => {
+    // No API removal implemented; fall back to local change for now
     const all = JSON.parse(localStorage.getItem('buses') || '[]')
     const filtered = all.filter((b) => b.id !== id)
     localStorage.setItem('buses', JSON.stringify(filtered))
@@ -30,12 +44,12 @@ export default function ApprovedBuses() {
           </thead>
           <tbody>
             {buses.filter((b) => b.status === 'approved').map((b) => (
-              <tr key={b.id}>
-                <td style={{ padding: 8 }}>{b.plate}</td>
+              <tr key={b.id || b.bus_id}>
+                <td style={{ padding: 8 }}>{b.plate || b.bus_number}</td>
                 <td style={{ padding: 8 }}>{b.route}</td>
-                <td style={{ padding: 8 }}>{b.ownerId}</td>
+                <td style={{ padding: 8 }}>{b.ownerId || b.owner_nic}</td>
                 <td style={{ padding: 8 }}>
-                  <button className="btn outline" onClick={() => remove(b.id)}>Remove</button>
+                  <button className="btn outline" onClick={() => remove(b.id || b.bus_id)}>Remove</button>
                 </td>
               </tr>
             ))}

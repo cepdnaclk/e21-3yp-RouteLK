@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import '../Home.css'
+import { adminRegister } from '../../api'
 
 export default function AdminRegister() {
   const [fullName, setFullName] = useState('')
@@ -13,7 +14,7 @@ export default function AdminRegister() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     if (!fullName || !governmentEmail || !idNumber || !employeeNumber || !designation) {
@@ -29,20 +30,13 @@ export default function AdminRegister() {
       return
     }
 
-    const admins = JSON.parse(localStorage.getItem('admins') || '[]')
-    // ensure unique government email
-    if (admins.find((a) => a.governmentEmail === governmentEmail)) {
-      setError('An account with this government email already exists')
-      return
+    try {
+      await adminRegister({ fullName, governmentEmail, idNumber, employeeNumber, designation, contactNumber, password })
+      setSuccess('Successfully registered admin. Redirecting to login...')
+      setTimeout(() => { window.location.hash = '#/login' }, 1400)
+    } catch (err) {
+      setError(err.message || 'Registration failed')
     }
-
-    admins.push({ fullName, governmentEmail, idNumber, employeeNumber, designation, contactNumber, password })
-    localStorage.setItem('admins', JSON.stringify(admins))
-
-    setSuccess('Successfully registered admin. Redirecting to login...')
-    setTimeout(() => {
-      window.location.hash = '#/login'
-    }, 1800)
   }
 
   return (

@@ -1,21 +1,32 @@
 import React, { useState } from 'react'
 import './Home.css'
+import { adminLogin } from '../api'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const admins = JSON.parse(localStorage.getItem('admins') || '[]')
-    const found = admins.find((a) => a.governmentEmail === email && a.password === password)
-    if (!found) {
-      setError('Invalid credentials. If you have no account, create one.')
-      return
+    setError('')
+    try {
+      const res = await adminLogin(email, password)
+      // API should return admin info; fallback to token or simple object
+      const auth = (res && (res.admin || res)) || { email }
+      localStorage.setItem('adminAuth', JSON.stringify({ email: auth.governmentEmail || auth.email, name: auth.fullName || auth.name || auth.governmentEmail || email }))
+      window.location.hash = '#/admin'
+    } catch (err) {
+      // fallback to local auth if API fails or returns error
+      const admins = JSON.parse(localStorage.getItem('admins') || '[]')
+      const found = admins.find((a) => a.governmentEmail === email && a.password === password)
+      if (!found) {
+        setError(err.message || 'Invalid credentials. If you have no account, create one.')
+        return
+      }
+      localStorage.setItem('adminAuth', JSON.stringify({ email: found.governmentEmail, name: found.fullName }))
+      window.location.hash = '#/admin'
     }
-    localStorage.setItem('adminAuth', JSON.stringify({ email: found.governmentEmail, name: found.fullName }))
-    window.location.hash = '#/admin'
   }
 
   return (

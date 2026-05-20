@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { getApprovedBuses } from '../../api'
 
 function getTopRoutes(buses, top = 5) {
   const counts = {}
@@ -15,20 +16,31 @@ export default function Analytics() {
   const [buses, setBuses] = useState([])
 
   useEffect(() => {
-    // ensure sample data exists (so analytics shows even if PendingBuses wasn't visited)
-    const existing = JSON.parse(localStorage.getItem('buses') || 'null')
-    if (!existing) {
-      const sample = [
-        { id: 'b1', plate: 'WP KA-1234', route: 'Peradeniya - Gampola', ownerId: 'OWN-001', status: 'approved' },
-        { id: 'b2', plate: 'WP PB-5678', route: 'Peradeniya - Kurunegala', ownerId: 'OWN-002', status: 'approved' },
-        { id: 'b3', plate: 'WP LC-9012', route: 'Peradeniya - Matale', ownerId: 'OWN-003', status: 'approved' },
-        { id: 'b4', plate: 'WP XX-3344', route: 'Peradeniya - Gampola', ownerId: 'OWN-004', status: 'approved' },
-        { id: 'b5', plate: 'WP ZZ-7788', route: 'Peradeniya - Kandy', ownerId: 'OWN-005', status: 'approved' },
-        { id: 'b6', plate: 'WP YT-1122', route: 'Peradeniya - Gampola', ownerId: 'OWN-006', status: 'approved' },
-      ]
-      localStorage.setItem('buses', JSON.stringify(sample))
+    let mounted = true
+    async function load() {
+      try {
+        const data = await getApprovedBuses()
+        const list = Array.isArray(data) ? data : (data && data.buses) || []
+        if (mounted) return setBuses(list)
+      } catch (e) {
+        // fallback to local sample data
+      }
+      const existing = JSON.parse(localStorage.getItem('buses') || 'null')
+      if (!existing) {
+        const sample = [
+          { id: 'b1', plate: 'WP KA-1234', route: 'Peradeniya - Gampola', ownerId: 'OWN-001', status: 'approved' },
+          { id: 'b2', plate: 'WP PB-5678', route: 'Peradeniya - Kurunegala', ownerId: 'OWN-002', status: 'approved' },
+          { id: 'b3', plate: 'WP LC-9012', route: 'Peradeniya - Matale', ownerId: 'OWN-003', status: 'approved' },
+          { id: 'b4', plate: 'WP XX-3344', route: 'Peradeniya - Gampola', ownerId: 'OWN-004', status: 'approved' },
+          { id: 'b5', plate: 'WP ZZ-7788', route: 'Peradeniya - Kandy', ownerId: 'OWN-005', status: 'approved' },
+          { id: 'b6', plate: 'WP YT-1122', route: 'Peradeniya - Gampola', ownerId: 'OWN-006', status: 'approved' },
+        ]
+        localStorage.setItem('buses', JSON.stringify(sample))
+      }
+      if (mounted) setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
     }
-    setBuses(JSON.parse(localStorage.getItem('buses') || '[]'))
+    load()
+    return () => { mounted = false }
   }, [])
 
   const top = getTopRoutes(buses)
