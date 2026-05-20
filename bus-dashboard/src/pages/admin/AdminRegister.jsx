@@ -7,6 +7,7 @@ export default function AdminRegister() {
   const [idNumber, setIdNumber] = useState('')
   const [employeeNumber, setEmployeeNumber] = useState('')
   const [designation, setDesignation] = useState('')
+  const [contactNumber, setContactNumber] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -35,7 +36,7 @@ export default function AdminRegister() {
       return
     }
 
-    admins.push({ fullName, governmentEmail, idNumber, employeeNumber, designation, password })
+    admins.push({ fullName, governmentEmail, idNumber, employeeNumber, designation, contactNumber, password })
     localStorage.setItem('admins', JSON.stringify(admins))
 
     setSuccess('Successfully registered admin. Redirecting to login...')
@@ -77,6 +78,10 @@ export default function AdminRegister() {
               <div>
                 <label>Designation</label>
                 <input required value={designation} onChange={(e) => setDesignation(e.target.value)} style={{ width: '100%', padding: 8, marginTop:6 }} />
+              </div>
+              <div>
+                <label>Contact number</label>
+                <input type="tel" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} placeholder="e.g. +94123456789" style={{ width: '100%', padding: 8, marginTop:6 }} />
               </div>
             </div>
 
