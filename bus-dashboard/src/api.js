@@ -24,6 +24,8 @@ export async function adminRegister(adminData) {
 
 // ── Bus Management ────────────────────────────────
 
+// Bus Management
+
 export async function getPendingBuses() {
   const url = `${API}/buses/pending`
   console.debug('[api] GET', url)
@@ -69,6 +71,8 @@ export async function rejectBus(busId) {
   return handleResponse(res);
 }
 
+// ── Helpers ───────────────────────────────────────
+
 async function handleResponse(res) {
   if (res.status === 204) return null;
   let data = null;
@@ -78,26 +82,28 @@ async function handleResponse(res) {
     const txt = await res.text();
     data = txt || null;
   }
+  // unwrap Lambda proxy response if body is a string
+  if (data && typeof data.body === 'string') {
+    try { data = JSON.parse(data.body); } catch (e) { /* keep original */ }
+  }
   if (!res.ok) {
-    const msg = (data && data.message) || res.statusText || 'API error';
+    const msg = (data && data.error) || (data && data.message) || res.statusText || 'API error';
     throw new Error(msg);
   }
   return data;
 }
 
 function normalizeBuses(data) {
-  // data may be an array or an object containing { buses: [...] }
-  const arr = Array.isArray(data) ? data : (data && data.buses) || []
+  const arr = Array.isArray(data) ? data : (data && data.buses) || [];
   return arr.map((b) => ({
-    id: b.id || b.bus_id || b._id || null,
-    bus_id: b.bus_id || b.id || b._id || null,
-    bus_number: b.bus_number || b.plate || b.number || b.registration || '',
-    plate: b.plate || b.bus_number || b.registration || '',
-    route: b.route || b.route_name || b.path || '',
-    ownerId: b.ownerId || b.owner_nic || b.owner || b.ownerId || '',
-    owner_nic: b.owner_nic || b.ownerId || b.owner || '',
-    bus_type: b.bus_type || b.type || '',
-    total_seats: b.total_seats || b.seats || b.capacity || null,
-    status: b.status || b.bus_status || (b.approved ? 'approved' : 'pending') || null,
-  }))
+    bus_id:      b.bus_id || b.id || null,
+    bus_number:  b.bus_number || b.plate || '',
+    route:       b.route || '',
+    owner_nic:   b.owner_nic || b.ownerId || '',
+    bus_type:    b.bus_type || '',
+    total_seats: b.total_seats || null,
+    contact_no:  b.contact_no || '',
+    approved:    b.approved || false,
+    created_at:  b.created_at || null,
+  }));
 }

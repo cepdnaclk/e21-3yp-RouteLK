@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { getApprovedBuses } from '../../api'
+import { getApprovedBuses, getPendingBuses } from '../../api'
 
 function getTopRoutes(buses, top = 5) {
   const counts = {}
   buses.forEach((b) => {
-    if (b.status !== 'approved') return
+    const isApproved = b.status === 'approved' || b.approved === true
+    if (!isApproved) return
     counts[b.route] = (counts[b.route] || 0) + 1
   })
   const arr = Object.keys(counts).map((r) => ({ route: r, count: counts[r] }))
@@ -19,9 +20,21 @@ export default function Analytics() {
     let mounted = true
     async function load() {
       try {
-        const data = await getApprovedBuses()
-        const list = Array.isArray(data) ? data : (data && data.buses) || []
-        if (mounted) return setBuses(list)
+        const [approvedData, pendingData] = await Promise.all([getApprovedBuses(), getPendingBuses()])
+        const approvedList = Array.isArray(approvedData) ? approvedData : (approvedData && approvedData.buses) || []
+        const pendingList = Array.isArray(pendingData) ? pendingData : (pendingData && pendingData.buses) || []
+        // merge by bus_id/ id - prefer approvedList values for approved flags
+        const map = new Map()
+        pendingList.forEach((b) => {
+          const id = b.bus_id || b.id || null
+          map.set(id || JSON.stringify(b), b)
+        })
+        approvedList.forEach((b) => {
+          const id = b.bus_id || b.id || null
+          map.set(id || JSON.stringify(b), { ...map.get(id || JSON.stringify(b)), ...b, approved: true, status: 'approved' })
+        })
+        const merged = Array.from(map.values())
+        if (mounted) return setBuses(merged)
       } catch (e) {
         // fallback to local sample data
       }
@@ -46,18 +59,29 @@ export default function Analytics() {
   const top = getTopRoutes(buses)
   const max = top.length ? Math.max(...top.map(t => t.count)) : 1
 
-  const approvedCount = buses.filter(b => b.status === 'approved').length
+  const approvedCount = buses.filter(b => b.status === 'approved' || b.approved === true).length
+  const serverRejected = buses.filter(b => b.status === 'rejected' || b.approved === false).length
+  let localRejected = 0
+  try {
+    localRejected = JSON.parse(localStorage.getItem('rejected_buses') || '[]').length || 0
+  } catch (e) { localRejected = 0 }
+  const rejectedCount = serverRejected + localRejected
 
   return (
     <div>
       <h2>Analytics</h2>
       <p>All registered (approved) busses and top 5 routes by number of busses.</p>
 
-      <div style={{ background: '#fff', padding: 20, borderRadius: 8, marginBottom: 18, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ flex: '0 0 auto' }}>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 18 }}>
+        <div style={{ background: '#fff', padding: 20, borderRadius: 8, flex: 1, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           <h3 style={{ margin: 0 }}>Registered Buses</h3>
-          <div style={{ fontSize: 26, fontWeight: 700, marginTop: 6 }}>{approvedCount}</div>
-          <div style={{ color: '#6b7280', marginTop: 4 }}>{buses.length} total, {approvedCount} approved</div>
+          <div style={{ fontSize: 40, fontWeight: 800, marginTop: 8 }}>{approvedCount}</div>
+          <div style={{ color: '#6b7280', marginTop: 6 }}>{buses.length} total, {approvedCount} approved</div>
+        </div>
+        <div style={{ background: '#fff', padding: 20, borderRadius: 8, flex: 1, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <h3 style={{ margin: 0 }}>Rejected Buses</h3>
+          <div style={{ fontSize: 40, fontWeight: 800, marginTop: 8, color: '#ef4444' }}>{rejectedCount}</div>
+          <div style={{ color: '#6b7280', marginTop: 6 }}>{rejectedCount} rejected</div>
         </div>
       </div>
 
