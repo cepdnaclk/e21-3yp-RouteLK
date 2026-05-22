@@ -11,21 +11,35 @@ class MapUtils {
       throw Exception('Cannot calculate bounds for empty bus list');
     }
 
-    double minLat = buses.values.first.location.latitude;
-    double maxLat = buses.values.first.location.latitude;
-    double minLng = buses.values.first.location.longitude;
-    double maxLng = buses.values.first.location.longitude;
+    final validLocations = buses.values
+        .map((bus) => bus.location)
+        .where(
+          (location) =>
+              location.latitude.isFinite && location.longitude.isFinite,
+        )
+        .toList();
 
-    for (var bus in buses.values) {
-      if (bus.location.latitude < minLat) minLat = bus.location.latitude;
-      if (bus.location.latitude > maxLat) maxLat = bus.location.latitude;
-      if (bus.location.longitude < minLng) minLng = bus.location.longitude;
-      if (bus.location.longitude > maxLng) maxLng = bus.location.longitude;
+    if (validLocations.isEmpty) {
+      throw Exception('Cannot calculate bounds for invalid bus coordinates');
+    }
+
+    double minLat = validLocations.first.latitude;
+    double maxLat = validLocations.first.latitude;
+    double minLng = validLocations.first.longitude;
+    double maxLng = validLocations.first.longitude;
+
+    for (var location in validLocations) {
+      if (location.latitude < minLat) minLat = location.latitude;
+      if (location.latitude > maxLat) maxLat = location.latitude;
+      if (location.longitude < minLng) minLng = location.longitude;
+      if (location.longitude > maxLng) maxLng = location.longitude;
     }
 
     // Add padding to bounds
-    final latPadding = (maxLat - minLat) * 0.1;
-    final lngPadding = (maxLng - minLng) * 0.1;
+    final latSpan = (maxLat - minLat).abs();
+    final lngSpan = (maxLng - minLng).abs();
+    final latPadding = latSpan == 0 ? 0.005 : latSpan * 0.1;
+    final lngPadding = lngSpan == 0 ? 0.005 : lngSpan * 0.1;
 
     return LatLngBounds(
       LatLng(minLat - latPadding, minLng - lngPadding),
@@ -40,6 +54,11 @@ class MapUtils {
     EdgeInsets padding = const EdgeInsets.all(50),
   }) {
     if (buses.isEmpty) return;
+
+    if (buses.length == 1) {
+      controller.move(buses.values.first.location, 16);
+      return;
+    }
 
     final bounds = calculateBusBounds(buses);
     controller.fitCamera(CameraFit.bounds(bounds: bounds, padding: padding));
