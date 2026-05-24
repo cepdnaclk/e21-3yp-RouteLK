@@ -1,22 +1,35 @@
 const API = import.meta.env.VITE_API_URL || 'https://grcwv997gb.execute-api.eu-north-1.amazonaws.com/prod';
+const ADMIN_API = 'https://eutls380fb.execute-api.eu-north-1.amazonaws.com/prod';// ── Auth ──────────────────────────────────────────
 
-// ── Auth ──────────────────────────────────────────
-
-export async function adminLogin(government_email, password) {
-  const res = await fetch(`${API}/admin/login`, {
+export async function adminLogin(email, password) {
+  const res = await fetch(`${ADMIN_API}/adminLogin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ government_email, password_hash: password }),
+    body: JSON.stringify({ email, password }),
     mode: 'cors',
   });
   return handleResponse(res);
 }
 
 export async function adminRegister(adminData) {
-  const res = await fetch(`${API}/admin/register`, {
+  const res = await fetch(`${ADMIN_API}/adminRegister`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(adminData),
+    body: JSON.stringify({
+      name: adminData.fullName,
+      email: adminData.governmentEmail,
+      password: adminData.password
+    }),
+    mode: 'cors',
+  });
+  return handleResponse(res);
+}
+
+export async function adminVerifyOTP(email, otp) {
+  const res = await fetch(`${ADMIN_API}/adminVerifyOTP`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
     mode: 'cors',
   });
   return handleResponse(res);
@@ -24,15 +37,12 @@ export async function adminRegister(adminData) {
 
 // ── Bus Management ────────────────────────────────
 
-// Bus Management
-
 export async function getPendingBuses() {
   const url = `${API}/buses/pending`
   console.debug('[api] GET', url)
   const res = await fetch(url, { mode: 'cors' });
   let data = await handleResponse(res)
   console.debug('[api] response', url, res.status, data)
-  // handle API Gateway / Lambda proxy wrappers (body as string)
   if (data && typeof data.body === 'string') {
     try { data = JSON.parse(data.body) } catch (e) { /* keep original */ }
   }
@@ -82,7 +92,6 @@ async function handleResponse(res) {
     const txt = await res.text();
     data = txt || null;
   }
-  // unwrap Lambda proxy response if body is a string
   if (data && typeof data.body === 'string') {
     try { data = JSON.parse(data.body); } catch (e) { /* keep original */ }
   }
