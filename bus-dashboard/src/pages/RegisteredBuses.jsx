@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './Home.css'
+import applogo from '../../images/applogo.jpeg'
 import { getApprovedBuses } from '../api'
 
 const sampleBuses = [
@@ -34,6 +35,7 @@ export default function RegisteredBuses() {
           <div className="hd-title">RouteLK</div>
           <div className="hd-sub">Track your bus & save your time</div>
         </div>
+        <img src={applogo} alt="RouteLK logo" className="hd-logo" />
       </header>
 
       <nav className="hd-tabs" aria-label="Primary">

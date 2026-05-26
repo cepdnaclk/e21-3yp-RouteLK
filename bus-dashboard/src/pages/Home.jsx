@@ -8,6 +8,7 @@ import bus4 from '../../images/bus4.jpeg'
 import uop from '../../images/uop.jpg'
 import app1 from '../../images/app1.jpeg'
 import app2 from '../../images/app2.jpeg'
+import applogo from '../../images/applogo.jpeg'
 
 const images = [bus1, bus2, bus4]
 
@@ -33,6 +34,7 @@ export default function Home() {
           <div className="hd-title">RouteLK</div>
           <div className="hd-sub">Track your bus & save your time</div>
         </div>
+          <img src={applogo} alt="RouteLK logo" className="hd-logo" />
       </header>
 
       <nav className="hd-tabs" aria-label="Primary">

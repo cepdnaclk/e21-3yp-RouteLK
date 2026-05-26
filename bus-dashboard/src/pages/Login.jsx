@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import './Home.css'
+import applogo from '../../images/applogo.jpeg'
 import { adminLogin } from '../api'
 
 export default function Login() {
@@ -34,6 +35,7 @@ export default function Login() {
           <div className="hd-title">RouteLK</div>
           <div className="hd-sub">Admin Login</div>
         </div>
+        <img src={applogo} alt="RouteLK logo" className="hd-logo" />
       </header>
       <main className="hd-container" style={{ minHeight: 'calc(100vh - 112px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <section style={{ background: '#fff', padding: 24, borderRadius: 8, width: '100%', maxWidth: 560, boxSizing: 'border-box' }}>

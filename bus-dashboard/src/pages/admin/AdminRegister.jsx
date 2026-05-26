@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import '../Home.css'
+import applogo from '../../../images/applogo.jpeg'
 import { adminRegister, adminVerifyOTP } from '../../api'
 
 export default function AdminRegister() {
@@ -77,6 +78,7 @@ export default function AdminRegister() {
             <div className="hd-title">RouteLK</div>
             <div className="hd-sub">Verify Your Email</div>
           </div>
+          <img src={applogo} alt="RouteLK logo" className="hd-logo" />
         </header>
         <main className="hd-container" style={{ minHeight: 'calc(100vh - 112px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <section style={{ background: '#fff', padding: 32, borderRadius: 8, width: '100%', maxWidth: 400, boxSizing: 'border-box', textAlign: 'center' }}>
@@ -126,6 +128,7 @@ export default function AdminRegister() {
           <div className="hd-title">RouteLK</div>
           <div className="hd-sub">Admin Registration</div>
         </div>
+        <img src={applogo} alt="RouteLK logo" className="hd-logo" />
       </header>
       <main className="hd-container" style={{ minHeight: 'calc(100vh - 112px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <section style={{ background: '#fff', padding: 24, borderRadius: 8, width: '100%', maxWidth: 720, boxSizing: 'border-box' }}>
