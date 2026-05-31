@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/cognito_auth_service.dart';
 import 'confirm_sign_up_page.dart';
 import 'driver_home_page.dart';
+import 'driver_sign_in_page.dart';
 
 class DriverSignUpPage extends StatefulWidget {
   const DriverSignUpPage({super.key});
@@ -57,16 +58,80 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
       );
     } catch (e) {
       if (!mounted) return;
+
+      String errorMessage = e.toString();
+
+      // Handle unconfirmed account — offer to resend OTP
+      if (errorMessage.contains('UsernameExistsException')) {
+        final email = _emailController.text.trim();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'This email is already registered but not confirmed. Resend OTP code?'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 6),
+            action: SnackBarAction(
+              label: 'Resend',
+              onPressed: () async {
+                try {
+                  final auth = CognitoAuthService.driver();
+                  await auth.resendConfirmationCode(email);
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ConfirmSignUpPage(
+                          email: email,
+                          displayName: _nameController.text.trim(),
+                          authService: auth,
+                          nextPageBuilder: (_) => DriverHomePage(
+                            userName: _nameController.text.trim(),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                } catch (resendError) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Resend failed: ${resendError.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+          ),
+        );
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+
+      // Handle password requirement errors with friendly messages
+      if (errorMessage.contains('InvalidPasswordException')) {
+        if (errorMessage.contains('not long enough')) {
+          errorMessage = 'Password is too short. Must be at least 8 characters.';
+        } else if (errorMessage.contains('not meet')) {
+          errorMessage =
+              'Password must contain: uppercase, lowercase, number, and special character.';
+        } else {
+          errorMessage = 'Password does not meet requirements. Try: MyPass123!';
+        }
+      } else if (errorMessage.contains('InvalidEmailAddressException')) {
+        errorMessage = 'Invalid email address format.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sign up failed: ${e.toString()}'),
+          content: Text('Sign up failed: $errorMessage'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -122,36 +187,14 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                   style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 40),
+
+                // Full Name
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
                   style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    hintText: 'Enter your full name',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
+                  decoration: _inputDecoration('Full Name', 'Enter your full name',
+                      Icons.person_outline),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your name';
@@ -163,118 +206,69 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // Email
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
+                  decoration: _inputDecoration(
+                      'Email', 'Enter your email', Icons.email_outlined),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value.trim())) {
+                    if (!RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+                        .hasMatch(value.trim())) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
                   style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Choose a password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
+                  decoration: _inputDecoration(
+                    'Password',
+                    'Min 8 chars, uppercase, lowercase, number, special char',
+                    Icons.lock_outline,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
                     }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                    if (value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return 'Password must contain uppercase letter (A-Z)';
+                    }
+                    if (!RegExp(r'[a-z]').hasMatch(value)) {
+                      return 'Password must contain lowercase letter (a-z)';
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return 'Password must contain a number (0-9)';
+                    }
+                    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                      return 'Password must contain a special character (!@#\$%^&*)';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // Confirm Password
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: true,
                   style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    hintText: 'Re-enter your password',
-                    prefixIcon: const Icon(Icons.lock_reset_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFfec205),
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
+                  decoration: _inputDecoration(
+                      'Confirm Password', 'Re-enter your password',
+                      Icons.lock_reset_outlined),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
@@ -285,7 +279,27 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 12),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Already have an account? '),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const DriverSignInPage()),
+                          );
+                        },
+                        child: const Text('Sign in'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -321,6 +335,33 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
           ),
         ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(
+      String label, String hint, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.grey),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFfec205), width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade50,
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'role_selection_page.dart';
 import '../services/cognito_auth_service.dart';
 import 'bus_registration_page.dart';
 
@@ -38,12 +38,25 @@ class _BusOperatorSignInPageState extends State<BusOperatorSignInPage> {
 
     try {
       final auth = CognitoAuthService.busOperator();
-      await auth.signIn(_emailController.text.trim(), _passwordController.text);
+      final session = await auth.signIn(_emailController.text.trim(), _passwordController.text);
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const BusRegistrationPage()),
+        MaterialPageRoute(
+          builder: (_) => BusRegistrationPage(
+            userName : auth.getDisplayNameFromSession(
+              session,
+              _emailController.text.split('@').first,
+            ),
+            userEmail: _emailController.text.trim(),
+            onLogout : () => Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => RoleSelectionPage()),
+              (route) => false,
+            ),
+          ),
+        )
       );
     } catch (e) {
       if (!mounted) return;

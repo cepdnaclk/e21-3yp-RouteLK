@@ -42,7 +42,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       );
       if (!mounted) return;
 
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ConfirmSignUpPage(
@@ -54,10 +54,72 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       );
     } catch (e) {
       if (!mounted) return;
+      
+      // Parse and format the error message
+      String errorMessage = e.toString();
+      
+      // Handle unconfirmed account (email already exists but not confirmed)
+      if (errorMessage.contains('UsernameExistsException')) {
+        final email = _emailController.text.trim();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('This email is already registered but not confirmed. Resend OTP code?'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 6),
+            action: SnackBarAction(
+              label: 'Resend',
+              onPressed: () async {
+                try {
+                  final auth = CognitoAuthService.passenger();
+                  await auth.resendConfirmationCode(email);
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ConfirmSignUpPage(
+                          email: email,
+                          displayName: _nameController.text.trim(),
+                          authService: auth,
+                        ),
+                      ),
+                    );
+                  }
+                } catch (resendError) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Resend failed: ${resendError.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+          ),
+        );
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+      
+      // Handle password requirements error
+      if (errorMessage.contains('InvalidPasswordException')) {
+        if (errorMessage.contains('not long enough')) {
+          errorMessage = 'Password is too short. Must be at least 8 characters.';
+        } else if (errorMessage.contains('not meet')) {
+          errorMessage = 'Password must contain: uppercase, lowercase, number, and special character.';
+        } else {
+          errorMessage = 'Password does not meet requirements. Try: MyPass123!';
+        }
+      } else if (errorMessage.contains('InvalidEmailAddressException')) {
+        errorMessage = 'Invalid email address format.';
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sign up failed: ${e.toString()}'),
+          content: Text('Sign up failed: $errorMessage'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
         ),
       );
     } finally {
@@ -209,7 +271,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintText: 'Choose a password',
+                    hintText: 'Min 8 chars, uppercase, lowercase, number, special char',
                     prefixIcon: const Icon(Icons.lock_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -235,7 +297,11 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Please enter a password';
-                    if (value.length < 6) return 'Password must be at least 6 characters';
+                    if (value.length < 8) return 'Password must be at least 8 characters';
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) return 'Password must contain uppercase letter (A-Z)';
+                    if (!RegExp(r'[a-z]').hasMatch(value)) return 'Password must contain lowercase letter (a-z)';
+                    if (!RegExp(r'[0-9]').hasMatch(value)) return 'Password must contain a number (0-9)';
+                    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) return 'Password must contain a special character (!@#\$%^&*)';
                     return null;
                   },
                 ),

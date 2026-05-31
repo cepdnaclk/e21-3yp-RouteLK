@@ -39,7 +39,9 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
     if (role == 'Passenger') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const UserRegistrationPage()),
+        MaterialPageRoute(
+          builder: (_) => const UserRegistrationPage(),
+        )
       );
       return;
     }
@@ -111,7 +113,15 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       case 'Bus Operator':
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const BusRegistrationPage()),
+          MaterialPageRoute(
+            builder: (_) => BusRegistrationPage(
+              onLogout: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+                (route) => false,
+              ),
+            ),
+          ),
         );
         break;
       case 'Passenger':

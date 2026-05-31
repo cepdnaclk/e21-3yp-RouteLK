@@ -59,12 +59,14 @@ class _AccountPageState extends State<AccountPage> {
     return CognitoAuthService.passenger();
   }
 
-  bool get _isPasswordChangeRequested => _newPasswordController.text.trim().isNotEmpty;
+  bool get _isPasswordChangeRequested =>
+      _newPasswordController.text.trim().isNotEmpty;
 
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final email = widget.email.trim();
+    // FIX: normalize email before passing to auth service
+    final email = widget.email.trim().toLowerCase();
     final currentPassword = _currentPasswordController.text;
     final newName = _nameController.text.trim();
     final wantsNameUpdate = newName.isNotEmpty && newName != widget.userName;
@@ -111,9 +113,7 @@ class _AccountPageState extends State<AccountPage> {
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -141,9 +141,7 @@ class _AccountPageState extends State<AccountPage> {
       },
     );
 
-    if (shouldDelete != true) {
-      return;
-    }
+    if (shouldDelete != true) return;
 
     if (_currentPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -158,7 +156,15 @@ class _AccountPageState extends State<AccountPage> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.deleteAccount(widget.email.trim(), _currentPasswordController.text);
+      // FIX: normalize email — this was the root cause of the
+      // "Incorrect username or password" error when deleting
+      final normalizedEmail = widget.email.trim().toLowerCase();
+
+      await _authService.deleteAccount(
+        normalizedEmail,
+        _currentPasswordController.text,
+      );
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account deleted successfully.')),
@@ -173,9 +179,21 @@ class _AccountPageState extends State<AccountPage> {
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      if (mounted) widget.onLogout();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -184,13 +202,7 @@ class _AccountPageState extends State<AccountPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Log out',
-            onPressed: widget.onLogout,
-          ),
-        ],
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -200,14 +212,37 @@ class _AccountPageState extends State<AccountPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  '${widget.role} Profile',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'View and update your account details. Use the buttons below to save changes, sign out, or permanently delete your account.',
-                  style: TextStyle(color: Colors.grey.shade700, height: 1.4),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFfec205).withOpacity(0.1),
+                    border: Border.all(
+                      color: const Color(0xFFfec205),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${widget.role} Account',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00458C),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Update your profile and security settings below',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
@@ -265,9 +300,7 @@ class _AccountPageState extends State<AccountPage> {
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return null;
-                    }
+                    if (value == null || value.isEmpty) return null;
                     if (value.length < 6) {
                       return 'New password must be at least 6 characters';
                     }
@@ -284,9 +317,7 @@ class _AccountPageState extends State<AccountPage> {
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (_newPasswordController.text.trim().isEmpty) {
-                      return null;
-                    }
+                    if (_newPasswordController.text.trim().isEmpty) return null;
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your new password';
                     }
@@ -319,7 +350,7 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton(
-                  onPressed: widget.onLogout,
+                  onPressed: _isLoading ? null : _handleLogout,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.black,
                     side: const BorderSide(color: Colors.black12),
