@@ -27,6 +27,7 @@ class OperatorDashboardPage extends StatefulWidget {
 class _OperatorDashboardPageState extends State<OperatorDashboardPage> {
   late Map<String, dynamic> _fullData;
   bool _isRefreshing = false;
+  
 
   static const Color _yellow   = Color(0xFFfec205);
   static const Color _darkBlue = Color(0xFF00458C);

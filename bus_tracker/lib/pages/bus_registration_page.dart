@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../services/api_service.dart';
 import 'pending_approval_page.dart';
 import 'account_page.dart';
@@ -111,6 +112,7 @@ class _BusRegistrationPageState extends State<BusRegistrationPage> {
     try {
       // Build payload matching DB columns
       final payload = {
+        'operator_email'    : widget.userEmail,   // ← ADD THIS LINE
         'bus_number'        : _busNumberController.text.trim(),
         'owner_nic'         : _ownerNicController.text.trim(),
         'contact_no'        : _contactNoController.text.trim(),

@@ -26,6 +26,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
     super.dispose();
   }
 
+  
+
   void _selectRole(String role) {
     setState(() {
       _selectedRole = role;
@@ -166,6 +168,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
                 ),
               ),
               const SizedBox(height: 30),
+
+
 
               _buildRoleCard(
                 title: 'Passenger',

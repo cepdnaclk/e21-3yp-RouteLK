@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/cognito_auth_service.dart';
+import 'role_selection_page.dart';
 
 class AccountPage extends StatefulWidget {
   final String role;
@@ -169,7 +170,13 @@ class _AccountPageState extends State<AccountPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account deleted successfully.')),
       );
-      widget.onLogout();
+      // Navigate safely to role selection (logout)
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+        (route) => false,
+      );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +192,12 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _handleLogout() async {
     try {
-      if (mounted) widget.onLogout();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
