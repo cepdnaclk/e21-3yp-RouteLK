@@ -89,19 +89,47 @@ export default function Analytics() {
         <h3>Top 5 Routes</h3>
         <div style={{ paddingTop: 8 }}>
           {top.length === 0 && <div>No route data available.</div>}
-          {top.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, height: 220, padding: '12px 8px' }}>
-              {top.map((t) => (
-                <div key={t.route} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, height: '100%', boxSizing: 'border-box' }}>
-                  <div style={{ fontSize: 12, color: '#374151', marginBottom: 6 }}>{t.count}</div>
-                  <div style={{ width: '100%', flex: '1 1 auto', display: 'flex', alignItems: 'flex-end' }}>
-                    <div style={{ width: '100%', height: `${(t.count / max) * 100}%`, background: '#f59e0b', borderRadius: 4, transition: 'height .3s' }} />
-                  </div>
-                  <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: '#374151', wordBreak: 'break-word' }}>{t.route}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          {top.length > 0 && (() => {
+            const viewW = 700
+            const viewH = 380
+            const margin = { top: 20, right: 20, bottom: 110, left: 48 }
+            const w = viewW - margin.left - margin.right
+            const h = viewH - margin.top - margin.bottom
+            const bars = top
+            const count = bars.length
+            const gap = 18 // spacing between bars
+            // compute bar width but cap to avoid overly wide bars when few items
+            const barW = Math.min(48, Math.max(14, Math.floor((w - gap * (count - 1)) / count)))
+            // no Y tick labels — only per-bar counts are shown
+
+            return (
+              <div style={{ width: '100%', height: 320, padding: '8px 4px' }}>
+                <svg viewBox={`0 0 ${viewW} ${viewH}`} style={{ width: '100%', height: '100%' }} preserveAspectRatio="xMidYMid meet">
+                  <g transform={`translate(${margin.left},${margin.top})`}>
+                    {/* (grid and axis removed) */}
+
+                    {/* Bars */}
+                    {bars.map((b, i) => {
+                      const x = i * (barW + gap)
+                      const barHeight = max > 0 ? (b.count / max) * h : 0
+                      const y = h - barHeight
+                      return (
+                        <g key={b.route}>
+                          <rect x={x} y={y} width={barW} height={barHeight} fill="#f59e0b" rx={6} />
+                          <text x={x + barW / 2} y={y - 8} fontSize={12} fill="#0f172a" textAnchor="middle">{b.count}</text>
+                          <text transform={`translate(${x + barW / 2}, ${h + 36}) rotate(-40)`} fontSize={11} fill="#374151" textAnchor="end" style={{ pointerEvents: 'none' }}>
+                            {b.route}
+                          </text>
+                        </g>
+                      )
+                    })}
+
+                    {/* axis removed */}
+                  </g>
+                </svg>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>

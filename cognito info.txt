@@ -1,0 +1,17 @@
+24hvn24849ct575lsgfbfuiak1       - client id
+
+eu-north-1_kFwgS2hfD          - user pool id
+
+
+
+{
+  "body": "{\"name\": \"Test Admin\", \"email\": \"dinithiepi@gmail.com\", \"password\": \"Test1234!\"}"
+}
+
+
+
+
+
+{
+  "body": "{\"email\": \"dinithiepi@gmail.com\", \"otp\": \"786505\"}"
+}
