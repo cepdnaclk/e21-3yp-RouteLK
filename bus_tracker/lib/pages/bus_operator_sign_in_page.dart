@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'role_selection_page.dart';
 import '../services/cognito_auth_service.dart';
-import 'bus_registration_page.dart';
+import 'operator_home_page.dart';
 
 class BusOperatorSignInPage extends StatefulWidget {
   const BusOperatorSignInPage({super.key});
@@ -44,7 +44,7 @@ class _BusOperatorSignInPageState extends State<BusOperatorSignInPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => BusRegistrationPage(
+          builder: (_) => OperatorHomePage(
             userName : auth.getDisplayNameFromSession(
               session,
               _emailController.text.split('@').first,

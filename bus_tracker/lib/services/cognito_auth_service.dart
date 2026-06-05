@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'api_service.dart';
 
 class CognitoAuthService {
-  static const String passengerUserPoolId = 'eu-north-1_JE5LQYoKc';
-  static const String passengerClientId   = '1it2qn24uchtnoehg6ee8paqtf';
-  static const String driverUserPoolId    = 'eu-north-1_M6UM0173t';
-  static const String driverClientId      = '5nd5h1nmojf8qfn7dbablui8vg';
+  static const String passengerUserPoolId   = 'eu-north-1_JE5LQYoKc';
+  static const String passengerClientId     = '1it2qn24uchtnoehg6ee8paqtf';
+  static const String driverUserPoolId      = 'eu-north-1_M6UM0173t';
+  static const String driverClientId        = '5nd5h1nmojf8qfn7dbablui8vg';
   static const String busOperatorUserPoolId = 'eu-north-1_pUy3ngXWf';
   static const String busOperatorClientId   = 'taq6q8tjtcbd423rnl0pj2m28';
 
   final CognitoUserPool userPool;
-  final String userPoolId; // kept so deleteAccount knows which table to target
+  final String userPoolId;
 
   CognitoAuthService._(this.userPool, this.userPoolId);
 
@@ -68,6 +68,13 @@ class CognitoAuthService {
     return await cognitoUser.authenticateUser(authDetails);
   }
 
+  /// Sign out the current user and clear their cached session.
+  Future<void> signOut(String email) async {
+    final normalizedEmail = _normalizeEmail(email);
+    final cognitoUser = CognitoUser(normalizedEmail, userPool);
+    await cognitoUser.signOut();
+  }
+
   /// Update the user's display name in Cognito.
   Future<void> updateDisplayName(
       String email, String currentPassword, String newName) async {
@@ -97,6 +104,7 @@ class CognitoAuthService {
 
   /// Delete the signed-in user's account.
   /// Order: authenticate → delete from DB → delete from Cognito.
+  /// Bus operators also deactivate all their buses via a separate call.
   /// If DB delete fails, Cognito user stays intact so the user can retry.
   Future<void> deleteAccount(String email, String currentPassword) async {
     final normalizedEmail = _normalizeEmail(email);
@@ -109,10 +117,16 @@ class CognitoAuthService {
     // Step 1: Authenticate
     await cognitoUser.authenticateUser(authDetails);
 
-    // Step 2: Delete from DB first (passes userPoolId so Lambda picks correct table)
+    // Step 2: Delete from DB via the generic lambda (works for all roles
+    // including bus operators — sets is_deleted=true in bus_operators table)
     await ApiService.deleteUserFromDb(normalizedEmail, userPoolId);
 
-    // Step 3: Delete from Cognito only after DB succeeds
+    // Step 3: For bus operators, also deactivate all their buses
+    if (userPoolId == busOperatorUserPoolId) {
+      await ApiService.deactivateBusOperatorBuses(normalizedEmail);
+    }
+
+    // Step 4: Delete from Cognito only after DB steps succeed
     await cognitoUser.deleteUser();
   }
 

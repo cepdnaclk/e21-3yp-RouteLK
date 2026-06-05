@@ -135,6 +135,23 @@ class _PendingApprovalPageState extends State<PendingApprovalPage>
             ),
             child: Row(
               children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 40,
+                    width : 40,
+                    decoration: BoxDecoration(
+                      color       : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black87,
+                      size : 22,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

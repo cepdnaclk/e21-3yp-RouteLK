@@ -113,6 +113,7 @@ class _BusRegistrationPageState extends State<BusRegistrationPage> {
       final payload = {
         'bus_number'        : _busNumberController.text.trim(),
         'owner_nic'         : _ownerNicController.text.trim(),
+        'operator_email'    : widget.userEmail,
         'contact_no'        : _contactNoController.text.trim(),
         'bus_type'          : _busType,
         'total_seats'       : int.parse(_totalSeatsController.text.trim()),

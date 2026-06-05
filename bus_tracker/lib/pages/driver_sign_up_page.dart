@@ -52,6 +52,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             authService: auth,
             nextPageBuilder: (_) => DriverHomePage(
               userName: _nameController.text.trim(),
+              userEmail: _emailController.text.trim(),
             ),
           ),
         ),
@@ -86,7 +87,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                           authService: auth,
                           nextPageBuilder: (_) => DriverHomePage(
                             userName: _nameController.text.trim(),
-                          ),
+                            userEmail: _emailController.text.trim(),
                         ),
                       ),
                     );

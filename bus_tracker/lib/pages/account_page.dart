@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/cognito_auth_service.dart';
+import 'role_selection_page.dart';
 
 class AccountPage extends StatefulWidget {
   final String role;
@@ -32,11 +33,11 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userName);
+    _nameController            = TextEditingController(text: widget.userName);
     _currentPasswordController = TextEditingController();
-    _newPasswordController = TextEditingController();
+    _newPasswordController     = TextEditingController();
     _confirmPasswordController = TextEditingController();
-    _authService = _buildAuthService();
+    _authService               = _buildAuthService();
   }
 
   @override
@@ -65,11 +66,11 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // FIX: normalize email before passing to auth service
-    final email = widget.email.trim().toLowerCase();
+    final email           = widget.email.trim().toLowerCase();
     final currentPassword = _currentPasswordController.text;
-    final newName = _nameController.text.trim();
-    final wantsNameUpdate = newName.isNotEmpty && newName != widget.userName;
+    final newName         = _nameController.text.trim();
+    final wantsNameUpdate =
+        newName.isNotEmpty && newName != widget.userName;
     final wantsPasswordUpdate = _isPasswordChangeRequested;
 
     if (!wantsNameUpdate && !wantsPasswordUpdate) {
@@ -146,7 +147,8 @@ class _AccountPageState extends State<AccountPage> {
     if (_currentPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Enter your current password to delete your account.'),
+          content:
+              Text('Enter your current password to delete your account.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -156,10 +158,14 @@ class _AccountPageState extends State<AccountPage> {
     setState(() => _isLoading = true);
 
     try {
-      // FIX: normalize email — this was the root cause of the
-      // "Incorrect username or password" error when deleting
       final normalizedEmail = widget.email.trim().toLowerCase();
 
+      // CognitoAuthService.deleteAccount() handles everything:
+      //   1. Authenticates
+      //   2. Soft-deletes from DB via POST /account/delete (all roles)
+      //   3. For bus operators: also calls PUT /operator/account/delete
+      //      to set approved=false on all their buses
+      //   4. Deletes from Cognito
       await _authService.deleteAccount(
         normalizedEmail,
         _currentPasswordController.text,
@@ -169,7 +175,12 @@ class _AccountPageState extends State<AccountPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account deleted successfully.')),
       );
-      widget.onLogout();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+        (route) => false,
+      );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +196,15 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _handleLogout() async {
     try {
-      if (mounted) widget.onLogout();
+      // Properly clear the Cognito session before navigating away.
+      // This was missing before — without it the session lingers in memory.
+      await _authService.signOut(widget.email);
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

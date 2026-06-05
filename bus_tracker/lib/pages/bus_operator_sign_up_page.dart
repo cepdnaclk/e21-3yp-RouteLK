@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'role_selection_page.dart';
 import '../services/cognito_auth_service.dart';
-import 'bus_registration_page.dart';
+import 'operator_home_page.dart';
 import 'confirm_sign_up_page.dart';
 import 'bus_operator_sign_in_page.dart';
 
@@ -50,7 +50,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
             email: _emailController.text.trim(),
             displayName: _nameController.text.trim(),
             authService: auth,
-            nextPageBuilder: (_) => BusRegistrationPage(
+            nextPageBuilder: (_) => OperatorHomePage(
               userName: _nameController.text.trim(),
               userEmail: _emailController.text.trim(),
               onLogout: () => Navigator.pushAndRemoveUntil(
@@ -90,7 +90,7 @@ class _BusOperatorSignUpPageState extends State<BusOperatorSignUpPage> {
                           email: email,
                           displayName: _nameController.text.trim(),
                           authService: auth,
-                          nextPageBuilder: (_) => BusRegistrationPage(
+                          nextPageBuilder: (_) => OperatorHomePage(
                             userName: _nameController.text.trim(),
                             userEmail: email,
                             onLogout: () => Navigator.pushAndRemoveUntil(
