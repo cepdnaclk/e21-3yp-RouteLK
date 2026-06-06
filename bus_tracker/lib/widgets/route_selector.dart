@@ -58,7 +58,7 @@ class RouteSelector extends StatelessWidget {
                       value: route,
                       child: Text(route),
                     );
-                  }).toList(),
+                  }),
                 ],
                 onChanged: onRouteChanged,
               ),

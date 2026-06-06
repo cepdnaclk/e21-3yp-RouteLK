@@ -15,7 +15,7 @@ lib/
 │
 ├── services/                          # Business logic & external services
 │   ├── location_service.dart         # Location & permissions handling
-│   └── firebase_bus_service.dart     # Firebase Realtime Database operations
+│   └── firebase_bus_service.dart     # AppSync-backed bus location polling and pickup request handling
 │
 ├── pages/                             # Screen/Page widgets
 │   └── bus_map_page.dart             # Main map page with bus tracking
@@ -36,7 +36,7 @@ lib/
 
 ### Services (`services/`)
 - **location_service.dart**: Handles geolocation permissions and current position retrieval.
-- **firebase_bus_service.dart**: Manages Firebase Realtime Database connections, bus data streaming, and filtering logic.
+- **firebase_bus_service.dart**: Manages AppSync bus location polling, filtering logic, and existing pickup request handling.
 
 ### Pages (`pages/`)
 - **bus_map_page.dart**: Main screen that orchestrates the map display, coordinates services, and manages state.
