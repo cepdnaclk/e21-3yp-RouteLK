@@ -638,6 +638,8 @@ class _BusMapPageState extends State<BusMapPage> {
       return const SizedBox.shrink();
     }
 
+    final isBusPicked = _pickedBusId != null;
+
     return Positioned(
       top: 12,
       right: 12,
@@ -646,20 +648,28 @@ class _BusMapPageState extends State<BusMapPage> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            onTap: _confirmMarkerAndFetchTraffic,
+            onTap: isBusPicked ? null : _confirmMarkerAndFetchTraffic,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.96),
+                color: isBusPicked
+                    ? Colors.grey.shade100
+                    : Colors.white.withValues(alpha: 0.96),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: Colors.blue.withValues(alpha: 0.16)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+                border: Border.all(
+                  color: isBusPicked
+                      ? Colors.grey.shade300
+                      : Colors.blue.withValues(alpha: 0.16),
+                ),
+                boxShadow: isBusPicked
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -668,11 +678,14 @@ class _BusMapPageState extends State<BusMapPage> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2F80ED), Color(0xFF56CCF2)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: isBusPicked
+                          ? null
+                          : const LinearGradient(
+                              colors: [Color(0xFF2F80ED), Color(0xFF56CCF2)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                      color: isBusPicked ? Colors.grey.shade400 : null,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Icon(
@@ -682,12 +695,12 @@ class _BusMapPageState extends State<BusMapPage> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
+                  Text(
                     'Set Location',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: Colors.black87,
+                      color: isBusPicked ? Colors.grey.shade500 : Colors.black87,
                     ),
                   ),
                 ],
@@ -1095,13 +1108,16 @@ class _BusMapPageState extends State<BusMapPage> {
 
   Widget _buildPickBusTile(String busId) {
     final isPicked = _pickedBusId == busId;
+    final isClickable = isPicked || _hasConfirmedPickupLocation;
 
     return Material(
-      color: isPicked ? Colors.red.shade50 : Colors.orange.shade50,
+      color: isClickable
+          ? (isPicked ? Colors.red.shade50 : Colors.orange.shade50)
+          : Colors.grey.shade200,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: _isSavingPickupRequest
+        onTap: (_isSavingPickupRequest || !isClickable)
             ? null
             : () async {
                 final pickupLocation = _pendingStartLocation ?? _startLocation;
@@ -1183,7 +1199,13 @@ class _BusMapPageState extends State<BusMapPage> {
             children: [
               Text(
                 isPicked ? 'Cancel Pick Up' : 'Pick Bus',
-                style: const TextStyle(fontSize: 11, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isClickable
+                      ? (isPicked ? Colors.red : Colors.black54)
+                      : Colors.grey.shade500,
+                  fontWeight: isPicked ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
               const SizedBox(height: 4),
               Row(
@@ -1197,16 +1219,20 @@ class _BusMapPageState extends State<BusMapPage> {
                       : Icon(
                           isPicked ? Icons.cancel_outlined : Icons.check_circle,
                           size: 16,
-                          color: isPicked ? Colors.red : Colors.deepOrange,
+                          color: isClickable
+                              ? (isPicked ? Colors.red : Colors.deepOrange)
+                              : Colors.grey.shade500,
                         ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       busId,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: Colors.deepOrange,
+                        color: isClickable
+                            ? (isPicked ? Colors.red : Colors.deepOrange)
+                            : Colors.grey.shade500,
                       ),
                     ),
                   ),

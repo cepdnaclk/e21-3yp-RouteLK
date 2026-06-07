@@ -169,6 +169,37 @@ class CognitoAuthService {
     return fallback;
   }
 
+  /// Extract the passenger ID from the custom token claim `custom:passengerId`.
+  int? getPassengerIdFromSession(CognitoUserSession? session) {
+    if (session == null) return null;
+
+    final jwtToken = session.getIdToken().getJwtToken();
+    if (jwtToken == null || jwtToken.isEmpty) return null;
+
+    final parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+
+    try {
+      final payload = utf8.decode(
+        base64Url.decode(base64Url.normalize(parts[1])),
+      );
+      final claims = jsonDecode(payload) as Map<String, dynamic>;
+
+      print("DEBUG: All Token Claims: $claims");
+      print("DEBUG: custom:passengerId value: ${claims['custom:passengerId']}");
+
+      final passengerIdStr = claims['custom:passengerId']?.toString().trim();
+      if (passengerIdStr != null && passengerIdStr.isNotEmpty) {
+        return int.tryParse(passengerIdStr);
+      }
+    } catch (_) {
+      return null;
+    }
+
+    return null;
+  }
+
+
   /// Get user's display name from Cognito attributes.
   Future<String?> getCurrentUserDisplayName(String email) async {
     try {

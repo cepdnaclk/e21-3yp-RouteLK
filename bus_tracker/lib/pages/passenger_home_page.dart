@@ -7,11 +7,13 @@ import 'role_selection_page.dart';
 class PassengerHomePage extends StatefulWidget {
   final String userName;
   final String userEmail;
+  final int passengerId;
 
   const PassengerHomePage({
     super.key,
     this.userName = 'Passenger',
     this.userEmail = '',
+    this.passengerId = 1,
   });
 
   @override
@@ -65,7 +67,7 @@ class _PassengerHomePageState extends State<PassengerHomePage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const BusMapPage(passengerId: 1),
+        builder: (_) => BusMapPage(passengerId: widget.passengerId),
       ),
     );
   }

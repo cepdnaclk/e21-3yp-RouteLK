@@ -14,6 +14,7 @@ class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -33,7 +34,7 @@ class _SplashPageState extends State<SplashPage>
     _controller.forward();
 
     // Navigate to role selection page after 3 seconds
-    Timer(const Duration(seconds: 3), () {
+    _timer = Timer(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const RoleSelectionPage()),
@@ -44,6 +45,7 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   void dispose() {
+    _timer?.cancel();
     _controller.dispose();
     super.dispose();
   }

@@ -41,6 +41,8 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
+      final passengerId = auth.getPassengerIdFromSession(session);
+      print("DEBUG: Logging in with Passenger ID: $passengerId");
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -51,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               _emailController.text.trim(),
             ),
             userEmail: _emailController.text.trim(),
+            passengerId: passengerId ?? 1,
           ),
         ),
       );

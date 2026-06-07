@@ -639,6 +639,11 @@ class FirebaseBusService {
     Map<String, dynamic> pickup,
     Map<String, LatLng> currentMap,
   ) {
+    final status = (pickup['status'] as String?)?.trim().toLowerCase();
+    if (status != null && status != 'pending') {
+      return currentMap;
+    }
+
     final pickId = (pickup['pickId'] as String?)?.trim();
     final latitude = (pickup['latitude'] as num?)?.toDouble();
     final longitude = (pickup['longitude'] as num?)?.toDouble();
