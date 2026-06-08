@@ -3,8 +3,6 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id 'com.android.application'
-    id 'com.google.gms.google-services' // add this at the bottom
     id("com.google.gms.google-services")
 }
 
@@ -48,7 +46,7 @@ flutter {
 
 dependencies {
     // Firebase Realtime Database
-    implementation 'com.google.firebase:firebase-database:20.2.0'
+    implementation("com.google.firebase:firebase-database:20.2.0")
 
     // If you want Firestore instead:
     // implementation 'com.google.firebase:firebase-firestore:24.5.0'
