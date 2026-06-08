@@ -39,6 +39,7 @@ dependencies:
   firebase_database: ^10.3.0
   amazon_cognito_identity_dart_2: 4.0.0
   web_socket_channel: ^3.0.3
+  fl_chart: ^1.2.0
 
 
 dev_dependencies:

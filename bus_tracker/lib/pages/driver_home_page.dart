@@ -3,6 +3,7 @@ import 'bus_map_page.dart';
 import 'passenger_home_page.dart';
 import 'account_page.dart';
 import 'role_selection_page.dart';
+import 'bus_id_input_page.dart';
 
 class DriverHomePage extends StatefulWidget {
   final String userName;
@@ -85,9 +86,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 
   void _navigateToAnalytics() {
-    // Placeholder for Analytics
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Analytics feature coming soon")),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const BusIdInputPage()),
     );
   }
 
