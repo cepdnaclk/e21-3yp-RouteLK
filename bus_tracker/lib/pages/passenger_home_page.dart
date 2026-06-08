@@ -103,6 +103,7 @@ class _PassengerHomePageState extends State<PassengerHomePage>
           passengerId: _passengerId!,
           passengerName: widget.userName,
           contactNo: widget.userEmail,
+          userEmail: widget.userEmail,
         ),
       ),
     );
