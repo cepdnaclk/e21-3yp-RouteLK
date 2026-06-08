@@ -1,6 +1,7 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'dart:convert';
 import 'api_service.dart';
+import 'booking_service.dart';
 
 class CognitoAuthService {
   static const String passengerUserPoolId   = 'eu-north-1_JE5LQYoKc';
@@ -103,9 +104,7 @@ class CognitoAuthService {
   }
 
   /// Delete the signed-in user's account.
-  /// Order: authenticate → delete from DB → delete from Cognito.
-  /// Bus operators also deactivate all their buses via a separate call.
-  /// If DB delete fails, Cognito user stays intact so the user can retry.
+  /// Order: authenticate → cancel bookings → delete from DB → delete from Cognito.
   Future<void> deleteAccount(String email, String currentPassword) async {
     final normalizedEmail = _normalizeEmail(email);
     final cognitoUser = CognitoUser(normalizedEmail, userPool);
@@ -113,20 +112,40 @@ class CognitoAuthService {
       username: normalizedEmail,
       password: currentPassword,
     );
-
+  
     // Step 1: Authenticate
     await cognitoUser.authenticateUser(authDetails);
-
-    // Step 2: Delete from DB via the generic lambda (works for all roles
-    // including bus operators — sets is_deleted=true in bus_operators table)
+  
+    // Step 2: Cancel all active bookings (passengers only)
+    if (userPoolId == passengerUserPoolId) {
+      try {
+        final bookingSvc = BookingService();
+        final passengerData = await bookingSvc.getPassengerByEmail(normalizedEmail);
+        final passengerId   = passengerData['passenger_id'] as int;
+        final bookings      = await bookingSvc.getMyBookings(passengerId: passengerId);
+  
+        for (final booking in bookings) {
+          if (booking.bookingStatus != 'cancelled') {
+            await bookingSvc.cancelBooking(
+              bookingId:   booking.bookingId,
+              passengerId: passengerId,
+            );
+          }
+        }
+      } catch (_) {
+        // Don't block deletion if booking cancellation fails
+      }
+    }
+  
+    // Step 3: Delete from DB (sets is_deleted=true)
     await ApiService.deleteUserFromDb(normalizedEmail, userPoolId);
-
-    // Step 3: For bus operators, also deactivate all their buses
+  
+    // Step 4: For bus operators, also deactivate all their buses
     if (userPoolId == busOperatorUserPoolId) {
       await ApiService.deactivateBusOperatorBuses(normalizedEmail);
     }
-
-    // Step 4: Delete from Cognito only after DB steps succeed
+  
+    // Step 5: Delete from Cognito only after DB steps succeed
     await cognitoUser.deleteUser();
   }
 
