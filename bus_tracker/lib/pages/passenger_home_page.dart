@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import '../services/booking_service.dart';
 import 'bus_map_page.dart';
 import 'ac_bus_booking_page.dart';
+import 'booking_dashboard_page.dart';
 import 'account_page.dart';
 import 'role_selection_page.dart';
 
 class PassengerHomePage extends StatefulWidget {
   final String userName;
   final String userEmail;
-  final int passengerId;
+  /// Optional: if already known (e.g. from Cognito token), pass it directly
+  /// so the page doesn't need to make an extra network call.
+  final int? passengerId;
 
   const PassengerHomePage({
     super.key,
     this.userName = 'Passenger',
     this.userEmail = '',
-    this.passengerId = 1,
+    this.passengerId,
   });
 
   @override
@@ -22,25 +26,17 @@ class PassengerHomePage extends StatefulWidget {
 
 class _PassengerHomePageState extends State<PassengerHomePage>
     with SingleTickerProviderStateMixin {
+
+  // ── Passenger account ─────────────────────────────────────────────────────
+  int? _passengerId;
+  bool _loadingPassenger = true;
+
+  final _bookingService = BookingService();
+
   int _selectedIndex = 0;
   late final AnimationController _animationController;
   late final Animation<double> _floatAnimation;
   late final Animation<double> _pulseAnimation;
-
-  String _getTimeBasedGreeting() {
-    final hour = DateTime.now().hour;
-
-    if (hour >= 5 && hour < 12) {
-      return 'Good Morning!';
-    }
-    if (hour >= 12 && hour < 17) {
-      return 'Good Afternoon!';
-    }
-    if (hour >= 17 && hour < 21) {
-      return 'Good Evening!';
-    }
-    return 'Good Evening!';
-  }
 
   @override
   void initState() {
@@ -55,6 +51,39 @@ class _PassengerHomePageState extends State<PassengerHomePage>
     _pulseAnimation = Tween<double>(begin: 0.85, end: 1.08).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+
+    // If passengerId was passed directly, use it; otherwise fetch via email.
+    if (widget.passengerId != null) {
+      _passengerId = widget.passengerId;
+      _loadingPassenger = false;
+    } else {
+      _fetchPassengerId();
+    }
+  }
+
+  Future<void> _fetchPassengerId() async {
+    if (widget.userEmail.isEmpty) {
+      setState(() => _loadingPassenger = false);
+      return;
+    }
+    try {
+      final data = await _bookingService.getPassengerByEmail(widget.userEmail);
+      setState(() {
+        _passengerId = data['passenger_id'] as int;
+        _loadingPassenger = false;
+      });
+    } catch (e) {
+      debugPrint('Could not fetch passenger: $e');
+      setState(() => _loadingPassenger = false);
+    }
+  }
+
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) return 'Good Morning!';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon!';
+    if (hour >= 17 && hour < 21) return 'Good Evening!';
+    return 'Good Evening!';
   }
 
   @override
@@ -67,7 +96,28 @@ class _PassengerHomePageState extends State<PassengerHomePage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BusMapPage(passengerId: widget.passengerId),
+        builder: (_) => BusMapPage(passengerId: _passengerId ?? 1),
+      ),
+    );
+  }
+
+  void _navigateToBooking() {
+    if (_passengerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Loading your account, please wait...')),
+      );
+      return;
+    }
+    // Go to dashboard — shows existing bookings + New Booking FAB
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BookingDashboardPage(
+          passengerId: _passengerId!,
+          passengerName: widget.userName,
+          contactNo: widget.userEmail,
+          userEmail: widget.userEmail,
+        ),
       ),
     );
   }
@@ -163,7 +213,7 @@ class _PassengerHomePageState extends State<PassengerHomePage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header area
+            // ── Header ──────────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
               decoration: const BoxDecoration(
@@ -220,6 +270,7 @@ class _PassengerHomePageState extends State<PassengerHomePage>
 
             const SizedBox(height: 14),
 
+            // ── Animated hero card ───────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: AnimatedBuilder(
@@ -307,8 +358,6 @@ class _PassengerHomePageState extends State<PassengerHomePage>
 
             if (_selectedIndex == 0) ...[
               const SizedBox(height: 16),
-
-              // Feature grid (bus-specific) — small rounded card with 8 items
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Card(
@@ -338,17 +387,17 @@ class _PassengerHomePageState extends State<PassengerHomePage>
                   ),
                 ),
               ),
-
               const SizedBox(height: 12),
             ],
 
             const SizedBox(height: 18),
 
-            // Action cards (Live Track + Booking)
+            // ── Action cards ─────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
+                  // Live tracking card
                   Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -411,20 +460,14 @@ class _PassengerHomePageState extends State<PassengerHomePage>
 
                   const SizedBox(height: 14),
 
+                  // Booking card
                   Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 6,
                     child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ACBusBookingPage(),
-                          ),
-                        );
-                      },
+                      onTap: _navigateToBooking,
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -439,11 +482,20 @@ class _PassengerHomePageState extends State<PassengerHomePage>
                                 color: const Color(0xFFfec205),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(
-                                Icons.event_seat,
-                                size: 28,
-                                color: Colors.black,
-                              ),
+                              child: _loadingPassenger
+                                  ? const SizedBox(
+                                      width: 28,
+                                      height: 28,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.black,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.event_seat,
+                                      size: 28,
+                                      color: Colors.black,
+                                    ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -459,7 +511,9 @@ class _PassengerHomePageState extends State<PassengerHomePage>
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Reserve seats quickly',
+                                    _loadingPassenger
+                                        ? 'Loading your account...'
+                                        : 'Reserve seats quickly',
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                     ),
@@ -480,9 +534,8 @@ class _PassengerHomePageState extends State<PassengerHomePage>
                 ],
               ),
             ),
-            const SizedBox(height: 18),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 48),
           ],
         ),
       ),
