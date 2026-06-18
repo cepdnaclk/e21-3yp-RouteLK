@@ -1,88 +1,86 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import '../models/bus_data.dart';
 
 /// Creates a marker for a bus with color-coded occupancy indicator
 class BusMarker {
-  static Marker create(String busId, BusData bus) {
+  static Marker create(
+    String busId,
+    BusData bus, {
+    double? bearing,
+    VoidCallback? onTap,
+    bool isHighlighted = false,
+  }) {
     final busColor = bus.occupancyColor;
+    final double markerSize = isHighlighted ? 85.0 : 70.0;
+    final double iconSize = isHighlighted ? 42.0 : 32.0;
 
     return Marker(
       point: bus.location,
-      width: 70,
-      height: 70,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 5,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: Icon(Icons.directions_bus, color: busColor, size: 35),
-          ),
-          // Bus ID and passenger count label below the icon
-          Positioned(
-            bottom: -5,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
+      width: markerSize,
+      height: markerSize,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (bearing != null)
+              Transform.rotate(
+                angle: bearing * pi / 180,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Icon(
+                    Icons.navigation,
                     color: busColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    busId,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    size: isHighlighted ? 18.0 : 14.0,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 1,
+              ),
+            Container(
+              padding: EdgeInsets.all(isHighlighted ? 4 : 0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: isHighlighted
+                    ? Border.all(color: const Color(0xFF00458C), width: 3.5)
+                    : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: isHighlighted
+                        ? const Color(0xFF00458C).withValues(alpha: 0.45)
+                        : Colors.black.withOpacity(0.3),
+                    blurRadius: isHighlighted ? 12 : 5,
+                    spreadRadius: isHighlighted ? 3 : 1,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: busColor, width: 1),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.person, size: 8, color: busColor),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${bus.passengers}',
-                        style: TextStyle(
-                          color: busColor,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
+              child: Icon(Icons.directions_bus, color: busColor, size: iconSize),
             ),
-          ),
-        ],
+            // Bus ID label below the icon
+            Positioned(
+              bottom: -5,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: busColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  busId,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
