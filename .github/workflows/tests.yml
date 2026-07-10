@@ -23,7 +23,9 @@ jobs:
           channel: stable
 
       - name: Install Dependencies
+        working-directory: bus_tracker
         run: flutter pub get
 
       - name: Run Tests
+        working-directory: bus_tracker
         run: flutter test test/validation_service_test.dart
