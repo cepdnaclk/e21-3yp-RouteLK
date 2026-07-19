@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        RouteLK | Smart Transportation Platform
+    </title>
+
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+</head>
+
+
+<body>
+
+
+    <div class="particles"></div>
+
+
+
+    <!-- NAVBAR -->
+
+
+    <header>
+
+
+        <nav class="navbar">
+
+
+            <div class="logo">
+
+                <i class="fa-solid fa-bus"></i>
+
+                Route<span>LK</span>
+
+            </div>
+
+
+
+            <ul class="nav-links">
+
+                <li>
+                    <a href="#home">Home</a>
+                </li>
+
+
+                <li>
+                    <a href="#problem">Problem</a>
+                </li>
+
+
+                <li>
+                    <a href="#solution">Solution</a>
+                </li>
+
+
+                <li>
+                    <a href="#architecture">Architecture</a>
+                </li>
+
+
+                <li>
+                    <a href="#technology">Tech Stack</a>
+                </li>
+
+
+                <li>
+                    <a href="#team">Team</a>
+                </li>
+
+
+            </ul>
+
+
+
+            <button class="nav-btn" id="btn-get-started">
+
+                Get Started
+
+            </button>
+
+
+
+        </nav>
+
+
+    </header>
+
+
+
+
+
+    <!-- HERO SECTION -->
+
+
+    <section class="hero" id="home">
+
+
+        <div class="hero-content">
+
+
+            <p class="tag">
+
+                SMART PUBLIC TRANSPORT PLATFORM
+
+            </p>
+
+
+
+            <h1>
+
+                The Future of
+
+                <br>
+
+                <span>
+                    Smart Bus Transportation
+                </span>
+
+            </h1>
+
+
+
+            <p class="description">
+
+
+                RouteLK is an IoT-based smart public transportation
+                management system that provides real-time bus tracking,
+                passenger occupancy monitoring, and cloud-connected
+                transport solutions.
+
+
+
+            </p>
+
+
+
+            <div class="hero-buttons">
+
+
+                <button class="primary" id="btn-explore">
+
+                    Explore Project
+
+                </button>
+
+
+                <button class="secondary" id="btn-architecture">
+
+                    View Architecture
+
+                </button>
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+    </section>
+
+
+
+
+
+
+    <!-- PROBLEM SECTION -->
+
+
+    <section id="problem" class="section">
+
+
+        <h2 class="title">
+
+            The Problem
+
+        </h2>
+
+
+        <p class="subtitle">
+
+            Current challenges faced by public transportation users
+
+        </p>
+
+
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+
+                <i class="fa-solid fa-map-location-dot"></i>
+
+
+                <h3>
+
+                    No Real-Time Tracking
+
+                </h3>
+
+
+                <p>
+
+                    Passengers cannot know the current
+                    location of buses or expected arrival time.
+
+                </p>
+
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+
+                <i class="fa-solid fa-users"></i>
+
+
+                <h3>
+
+                    Unknown Passenger Capacity
+
+                </h3>
+
+
+                <p>
+
+                    Passengers have no information about
+                    bus crowd levels before boarding.
+
+                </p>
+
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+
+                <i class="fa-solid fa-clock"></i>
+
+
+                <h3>
+
+                    Unpredictable Waiting Time
+
+                </h3>
+
+
+                <p>
+
+                    Passengers spend unnecessary time
+                    waiting at bus stops.
+
+                </p>
+
+
+            </div>
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+                <h3>
+
+                    Fragmented Systems
+
+                </h3>
+
+                <p>
+
+                    Existing apps provide only isolated features instead of a single, unified platform.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <h3>
+
+                    Reduced Reliability
+
+                </h3>
+
+                <p>
+
+                    These limitations decrease the convenience, trust, and appeal of public transport.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+    <!-- =========================
+        SOLUTION SECTION
+========================= -->
+
+    <section id="solution" class="section">
+
+        <h2 class="title">
+            Our Solution
+        </h2>
+
+        <!-- Introduction -->
+
+        <div class="solution-intro">
+
+            <p>
+
+                RouteLK is an IoT-based Smart Bus Tracking and Passenger Assistance System
+                designed to modernize public transport by integrating
+                embedded hardware, cloud services, and mobile applications into
+                one platform. Unlike existing solutions that provide
+                only individual services, RouteLK brings together real-time bus
+                tracking, passenger occupancy monitoring, A/C bus seat booking,
+                emergency notifications, and transport information within a
+                single mobile application.
+
+            </p>
+
+            <br>
+
+            <p>
+
+                Each bus is equipped with an ESP32-based embedded device that
+                continuously collects GPS location, passenger occupancy, and
+                emergency status using onboard sensors. The collected data is
+                securely transmitted to AWS Cloud through WiFi or the cellular network (optionally),
+                where it is processed, stored, and synchronized with the mobile
+                application in real time. This enables passengers to access
+                accurate transportation information while allowing transport
+                operators to efficiently monitor and manage their fleet.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- Highlights -->
+
+        <div class="solution-highlights">
+
+            <div class="highlight">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+                <h4>
+
+                    One Integrated Platform
+
+                </h4>
+
+                <p>
+
+                    Combines bus tracking, passenger occupancy,
+                    A/C bus booking, emergency alerts, and route
+                    information into a single application.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-microchip"></i>
+
+                <h3>
+
+                    Smart Bus Device
+
+                </h3>
+
+                <p>
+
+                    ESP32-based device collects GPS, occupancy, and emergency data.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="highlight">
+
+                <i class="fa-solid fa-cloud"></i>
+
+                <h4>
+
+                    Cloud Connected
+
+                </h4>
+
+                <p>
+
+                    AWS cloud services provide secure communication,
+                    real-time synchronization, authentication,
+                    and reliable data management.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="highlight">
+
+                <i class="fa-solid fa-mobile-screen"></i>
+
+                <h4>
+
+                    Passenger Friendly
+
+                </h4>
+
+                <p>
+
+                    An intuitive Flutter mobile application
+                    provides all transportation services
+                    through a simple user interface.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        </div>
+
+    </section>
+
+
+
+
+
+
+
+    <!-- FEATURES -->
+
+
+    <section id="features" class="section">
+
+
+        <h2 class="title">
+
+            Powerful Features
+
+        </h2>
+
+
+        <p class="subtitle">
+
+            Complete smart transportation solution
+
+        </p>
+
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <h3>
+                    Live GPS Tracking
+                </h3>
+
+                <p>
+                    View real-time bus locations.
+                </p>
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <h3>
+                    Occupancy Monitoring
+                </h3>
+
+                <p>
+                    Monitor passenger density.
+                </p>
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-bell"></i>
+
+                <h3>
+                    Emergency Alerts
+                </h3>
+
+                <p>
+                    Send instant emergency notifications.
+                </p>
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-route"></i>
+
+                <h3>
+                    Route Visualization
+                </h3>
+
+                <p>
+                    Display bus routes on maps.
+                </p>
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-database"></i>
+
+                <h3>
+                    Cloud Database
+                </h3>
+
+                <p>
+                    Secure data storage and access.
+                </p>
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <h3>
+                    Transport Analytics
+                </h3>
+
+                <p>
+                    Generate useful transport insights.
+                </p>
+
+            </div>
+
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ROLE-BASED FEATURES -->
+
+    <section id="role-features" class="section">
+
+        <h2 class="title">
+
+            Features by Role
+
+        </h2>
+
+        <p class="subtitle">
+
+            Tailored interfaces and functionalities designed for each user role in the ecosystem
+
+        </p>
+
+        <div class="role-grid">
+
+            <!-- Passenger Card -->
+            <div class="role-card passenger-role">
+
+                <div class="role-header">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <h3>Passenger</h3>
+
+                </div>
+
+                <ul class="role-feature-list">
+
+                    <li><i class="fa-solid fa-circle-check"></i> Real-time bus tracking</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> Bus arrival information</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> Passenger occupancy monitoring</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> Bus pickup requesting</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> A/C bus seat booking</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> Emergency notifications</li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- Bus Driver Card -->
+            <div class="role-card driver-role">
+
+                <div class="role-header">
+
+                    <i class="fa-solid fa-id-badge"></i>
+
+                    <h3>Bus Driver</h3>
+
+                </div>
+
+                <ul class="role-feature-list">
+
+                    <li><i class="fa-solid fa-circle-check"></i> View passenger pickup requests</li>
+
+                    <li><i class="fa-solid fa-circle-check"></i> Emergency alert activation</li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- Bus Operator Card -->
+            <div class="role-card operator-role">
+
+                <div class="role-header">
+
+                    <i class="fa-solid fa-bus"></i>
+
+                    <h3>Bus Operator</h3>
+
+                </div>
+
+                <ul class="role-feature-list">
+
+                    <li><i class="fa-solid fa-circle-check"></i> Add buses to the system</li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- Administrator Card -->
+            <div class="role-card admin-role">
+
+                <div class="role-header">
+
+                    <i class="fa-solid fa-user-shield"></i>
+
+                    <h3>Administrator</h3>
+
+                </div>
+
+                <ul class="role-feature-list">
+
+                    <li><i class="fa-solid fa-circle-check"></i> Approving bus adding requests</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SYSTEM ARCHITECTURE -->
+
+
+    <section id="architecture" class="section">
+
+        <h2 class="title">
+            System Architecture
+        </h2>
+
+        <p class="subtitle">
+            High-level architecture of the RouteLK Smart Bus Tracking and Passenger Assistance System
+        </p>
+
+        <div class="architecture-images">
+
+            <div class="architecture-card">
+
+                <h2>Highlevel System Architecture</h2>
+
+                <img src="assets/images/high_level_architecture.png" alt="RouteLK System Architecture">
+
+            </div>
+
+            <div class="architecture-card">
+
+                <h2>AWS Cloud Architecture</h2>
+
+                <img src="assets/images/AWS_architecture.png" alt="AWS Architecture">
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+
+
+    <!-- DATA FLOW -->
+
+
+    <section id="dataflow" class="section">
+
+
+        <h2 class="title">
+
+            Data Flow
+
+        </h2>
+
+
+        <p class="subtitle">
+
+            How information travels through RouteLK
+
+        </p>
+
+
+
+        <div class="architecture-images">
+
+            <div class="architecture-card">
+
+                <h2>System Data Flow Diagram</h2>
+
+                <img src="assets/images/data_flow_diagram.png" alt="RouteLK Data Flow Diagram">
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+
+    <!-- HARDWARE -->
+
+
+    <section id="hardware" class="section">
+
+
+        <h2 class="title">
+
+            Hardware Components
+
+        </h2>
+
+
+
+        <p class="subtitle">
+
+            Embedded system installed inside buses
+
+        </p>
+
+
+
+
+        <div class="hardware">
+
+
+            <div>
+
+                <i class="fa-solid fa-microchip"></i>
+
+                <br>
+
+                ESP32 DevKit
+
+            </div>
+
+
+
+            <div>
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <br>
+
+                NEO-M8N GPS
+
+            </div>
+
+
+
+            <div>
+
+                <i class="fa-solid fa-wave-square"></i>
+
+                <br>
+
+                HC-SR04 Ultrasonic Sensors
+
+            </div>
+
+
+
+
+            <div>
+
+                <i class="fa-solid fa-sim-card"></i>
+
+                <br>
+
+                SIM800L Module
+
+            </div>
+
+
+
+
+            <div>
+
+                <i class="fa-solid fa-display"></i>
+
+                <br>
+
+                16x2 LCD Display
+
+            </div>
+
+
+
+
+            <div>
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <br>
+
+                Emergency Button
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-battery-full"></i>
+
+                <br>
+
+                3.7V 3500mAh Batteries
+
+            </div>
+
+
+        </div>
+
+
+
+    </section>
+
+
+
+
+
+
+
+
+    <!-- TECHNOLOGY STACK -->
+
+
+    <section id="technology" class="section">
+
+
+        <h2 class="title">
+
+            Technology Stack
+
+        </h2>
+
+
+
+        <p class="subtitle">
+
+            Technologies used to build RouteLK
+
+        </p>
+
+
+
+
+        <div class="tech-container">
+
+
+            <!-- Frontend Category -->
+            <div class="tech-category-card">
+
+                <div class="tech-category-header">
+
+                    <i class="fa-solid fa-display"></i>
+
+                    <h3>Frontend</h3>
+
+                </div>
+
+                <div class="tech-list">
+
+                    <div class="tech-item">
+
+                        <h4>Flutter</h4>
+
+                        <p>Mobile application development</p>
+
+                    </div>
+
+
+                    <div class="tech-item">
+
+                        <h4>React</h4>
+
+                        <p>Responsive Admin Dashboard web interface</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>Google Maps SDK</h4>
+
+                        <p>Live map tracking and routing</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Backend Category -->
+            <div class="tech-category-card">
+
+                <div class="tech-category-header">
+
+                    <i class="fa-solid fa-server"></i>
+
+                    <h3>Backend</h3>
+
+                </div>
+
+                <div class="tech-list">
+
+                    <div class="tech-item">
+
+                        <h4>AWS Cloud Services</h4>
+
+                        <p>IoT Core, Lambda, DynamoDB, API Gateway</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>PostgreSQL</h4>
+
+                        <p>Relational data storage</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>Node.js</h4>
+
+                        <p>Server-side API and backend logic</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Communication Category -->
+            <div class="tech-category-card">
+
+                <div class="tech-category-header">
+
+                    <i class="fa-solid fa-wifi"></i>
+
+                    <h3>Communication</h3>
+
+                </div>
+
+                <div class="tech-list">
+
+                    <div class="tech-item">
+
+                        <h4>MQTT</h4>
+
+                        <p>Lightweight real-time message broker</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>REST API</h4>
+
+                        <p>Web service interactions and endpoints</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>HTTPS/TLS</h4>
+
+                        <p>Secure web communications and encryption</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Hardware Category -->
+            <div class="tech-category-card">
+
+                <div class="tech-category-header">
+
+                    <i class="fa-solid fa-microchip"></i>
+
+                    <h3>Hardware</h3>
+
+                </div>
+
+                <div class="tech-list">
+
+                    <div class="tech-item">
+
+                        <h4>Embedded C / C++</h4>
+
+                        <p>ESP32 DevKit firmware development</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>UART</h4>
+
+                        <p>Serial connection for GPS and SIM800L</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>GPIO</h4>
+
+                        <p>General-purpose inputs and outputs</p>
+
+                    </div>
+
+                    <div class="tech-item">
+
+                        <h4>I²C</h4>
+
+                        <p>Communication protocol for display modules</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- GitHub Category -->
+            <div class="tech-category-card">
+
+                <div class="tech-category-header">
+
+                    <i class="fa-brands fa-github"></i>
+
+                    <h3>GitHub</h3>
+
+                </div>
+
+                <div class="tech-list">
+
+                    <div class="tech-item">
+
+                        <h4>Version Control & CI/CD</h4>
+
+                        <p>Source code hosting, testing, and automation workflows</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+
+
+    <!-- TESTING -->
+
+    <!--
+    <section id="testing" class="section">
+
+
+        <h2 class="title">
+
+            Testing & Evaluation
+
+        </h2>
+
+
+
+
+        <div class="test-container">
+
+
+
+            <div class="test-card">
+
+                <h3>
+                    GPS Accuracy
+                </h3>
+
+                <div class="progress">
+
+                    <span style="width:95%"></span>
+
+                </div>
+
+                <p>
+                    95%
+                </p>
+
+            </div>
+
+
+
+
+
+            <div class="test-card">
+
+                <h3>
+                    Sensor Reliability
+                </h3>
+
+                <div class="progress">
+
+                    <span style="width:97%"></span>
+
+                </div>
+
+                <p>
+                    97%
+                </p>
+
+            </div>
+
+
+
+
+
+            <div class="test-card">
+
+                <h3>
+                    Cloud Connectivity
+                </h3>
+
+                <div class="progress">
+
+                    <span style="width:98%"></span>
+
+                </div>
+
+                <p>
+                    98%
+                </p>
+
+            </div>
+
+
+
+        </div>
+
+
+
+    </section>
+
+    -->
+
+
+
+
+
+
+    <!-- BUDGET -->
+
+
+    <section id="budget" class="section">
+
+
+        <h2 class="title">
+
+            Project Budget
+
+        </h2>
+
+
+
+        <table class="budget-table">
+
+
+            <tr>
+
+                <th>
+                    Component
+                </th>
+
+                <th>
+                    Estimated Cost
+                </th>
+
+            </tr>
+
+
+
+            <tr>
+
+                <td>
+                    ESP32 Development Board (ESP32 DevKitC)
+                </td>
+
+                <td>
+                    1490 LKR
+                </td>
+
+            </tr>
+
+
+
+            <tr>
+
+                <td>
+                    NEO-M8N GPS Module
+                </td>
+
+                <td>
+                    3990 LKR
+                </td>
+
+            </tr>
+
+
+
+            <tr>
+
+                <td>
+                    HC-SR04 Ultrasonic sensors x 4
+                </td>
+
+                <td>
+                    1000 LKR
+                </td>
+
+            </tr>
+
+
+
+            <tr>
+
+                <td>
+                    Battery(3.7V Li-ion) x 2 with casing
+                </td>
+
+                <td>
+                    1080 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    SIM 800L 2G GSM Module
+                </td>
+
+                <td>
+                    1190 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    TP4056 Type-C 5V 1A Charging Module
+                </td>
+
+                <td>
+                    160 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Push Buttons / Switches
+                </td>
+
+                <td>
+                    120 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Boost Convertor
+                </td>
+
+                <td>
+                    290 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    LM2596 Buck Convertor
+                </td>
+
+                <td>
+                    290 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Miscellaneous (resistors / breadboards / wires etc)
+                </td>
+
+                <td>
+                    1530 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Enclosure 3D printing
+                </td>
+
+                <td>
+                    4500 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    16x2 I2C LCD Character Display
+                </td>
+
+                <td>
+                    1000 LKR
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Total Cost
+                </td>
+
+                <td>
+                    16640 LKR
+                </td>
+
+            </tr>
+
+
+
+        </table>
+
+
+
+    </section>
+
+
+
+
+
+
+
+
+    <!-- TIMELINE -->
+
+    <!--
+    <section id="timeline" class="section">
+
+
+        <h2 class="title">
+
+            Project Timeline
+
+        </h2>
+
+
+
+
+        <div class="timeline">
+
+
+            <div>
+                Proposal
+            </div>
+
+
+            <div>
+                Prototype Development
+            </div>
+
+
+            <div>
+                Cloud Integration
+            </div>
+
+
+            <div>
+                Mobile Application
+            </div>
+
+
+            <div>
+                Testing
+            </div>
+
+
+            <div>
+                Final Deployment
+            </div>
+
+
+
+        </div>
+
+
+
+    </section>
+
+    -->
+
+
+
+
+
+
+    <!-- TEAM -->
+
+
+    <section id="team" class="section">
+
+
+        <h2 class="title">
+
+            Our Team
+
+        </h2>
+
+        <p class="subtitle">
+            Meet the team members and supervisors behind RouteLK
+        </p>
+
+
+        <!-- Core Team Subsection -->
+        <h3 class="team-subsection-title">Team Members</h3>
+        <div class="team-grid members-grid">
+            <div class="team-card">
+                <div class="team-img-wrapper">
+                    <img src="assets/team/thimal.png" alt="Thimal Liyanage">
+                </div>
+                <h3>Thimal Liyanage</h3>
+                <p class="reg-no">E/21/017</p>
+                <a href="mailto:e21017@eng.pdn.ac.lk" class="team-email">
+                    <i class="fa-solid fa-envelope"></i> e21017@eng.pdn.ac.lk
+                </a>
+            </div>
+
+            <div class="team-card">
+                <div class="team-img-wrapper">
+                    <img src="assets/team/dinithi.png" alt="Dinithi Epitakaduwa">
+                </div>
+                <h3>Dinithi Epitakaduwa</h3>
+                <p class="reg-no">E/21/126</p>
+                <a href="mailto:e21126@eng.pdn.ac.lk" class="team-email">
+                    <i class="fa-solid fa-envelope"></i> e21126@eng.pdn.ac.lk
+                </a>
+            </div>
+
+            <div class="team-card">
+                <div class="team-img-wrapper">
+                    <img src="assets/team/lakshika.png" alt="Lakshika Seneviratne">
+                </div>
+                <h3>Lakshika Seneviratne</h3>
+                <p class="reg-no">E/21/372</p>
+                <a href="mailto:e21372@eng.pdn.ac.lk" class="team-email">
+                    <i class="fa-solid fa-envelope"></i> e21372@eng.pdn.ac.lk
+                </a>
+            </div>
+
+            <div class="team-card">
+                <div class="team-img-wrapper">
+                    <img src="assets/team/ravindu.png" alt="Ravindu Sudasinghe">
+                </div>
+                <h3>Ravindu Sudasinghe</h3>
+                <p class="reg-no">E/21/391</p>
+                <a href="mailto:e21391@eng.pdn.ac.lk" class="team-email">
+                    <i class="fa-solid fa-envelope"></i> e21391@eng.pdn.ac.lk
+                </a>
+            </div>
+        </div>
+
+        <!-- Supervisors Subsection -->
+        <h3 class="team-subsection-title">Supervisors</h3>
+        <div class="team-grid supervisors-grid">
+            <div class="team-card">
+                <div class="team-img-wrapper">
+                    <img src="assets/team/supervisor.png" alt="Ms. Yasodha Vimukthi">
+                </div>
+                <h3>Ms. Yasodha Vimukthi</h3>
+
+                <a href="mailto:yasodhav@eng.pdn.ac.lk" class="team-email">
+                    <i class="fa-solid fa-envelope"></i> yasodhav@eng.pdn.ac.lk
+                </a>
+            </div>
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+
+    <!-- FUTURE WORK -->
+
+
+    <section class="section">
+
+
+        <h2 class="title">
+
+            Future Improvements
+
+        </h2>
+
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <h3>
+                    Advanced Analytics
+                </h3>
+
+                <p>
+
+                    Transport performance analysis
+
+                </p>
+
+
+            </div>
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-brain"></i>
+
+                <h3>
+                    AI Integration
+                </h3>
+
+                <p>
+
+                    Future intelligent prediction models
+
+                </p>
+
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <i class="fa-solid fa-building"></i>
+
+                <h3>
+                    Government Integration
+                </h3>
+
+                <p>
+
+                    Large scale public deployment
+
+                </p>
+
+
+            </div>
+
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+
+    <!-- FOOTER -->
+
+
+    <footer id="contact">
+
+
+        <h2>
+
+            RouteLK
+
+        </h2>
+
+
+
+        <p>
+
+            IoT Based Smart Bus Tracking and Passenger Assistance System
+            <br>
+            3rd Year Project
+
+        </p>
+
+
+
+        <p>
+
+            Department of Computer Engineering
+            <br>
+            University of Peradeniya
+
+        </p>
+
+
+
+
+        <div class="social">
+
+
+            <a href="https://github.com/cepdnaclk/e21-3yp-RouteLK" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i>
+            </a>
+
+
+        </div>
+
+
+
+    </footer>
+
+
+    <!-- IMAGE LIGHTBOX MODAL -->
+    <div id="imageModal" class="image-modal">
+        <span class="image-modal-close">&times;</span>
+        <img class="image-modal-content" id="modalImg" src="" alt="">
+        <div class="image-modal-caption" id="modalCaption"></div>
+    </div>
+
+
+    <!-- SCROLL TO TOP -->
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script src="js/script.js"></script>
+
+
+</body>
+
+
+</html>
