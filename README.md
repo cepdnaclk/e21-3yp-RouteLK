@@ -31,32 +31,33 @@ The Bus Tracking & Passenger Assistance System is an IoT- and cloud-powered inte
 - Real-time bus location tracking
 - Intelligent passenger counting
 - Dynamic crowd-level estimation
-- Traffic-aware arrival time prediction
+- Arrival time prediction
 - Robust offline data handling
 
-By combining embedded systems (ESP32 + IR sensors + GPS), wireless communication, and scalable backend services, the solution ensures accurate monitoring even in unstable network conditions.
+By combining embedded systems (ESP32 + Ultrasonic sensors + GPS), wireless communication, and scalable backend services, the solution ensures accurate monitoring even in unstable network conditions.
 
 This system demonstrates how IoT and cloud technologies can modernize public transportation with cost-effective and scalable architecture.
 
 ## Solution Architecture
 
 ### High Level Architecture Diagram
-![System Architecture](docs/images/architecture.png)
+![System Architecture](docs/assets/images/high_level_architecture.png)
+
 
 ### Edge Layer (Bus Device):
-An ESP32 board connected with peripheral components installed inside the bus collects passenger counts using IR sensors and tracks GPS location. Data is packaged in JSON format and stored locally if internet connectivity fails.
+An ESP32 board connected with peripheral components installed inside the bus collects passenger counts using ultrasonic sensors and tracks GPS location. Data is packaged in JSON format and stored locally if internet connectivity fails.
 
 ### Communication Layer:
-Telemetry is transmitted every 10 seconds via 2G connectivity using MQTT or REST. If the network drops, data is cached on an SD card and automatically synchronized once connectivity is restored.
+Telemetry is transmitted every 10 seconds via WiFi or optionally 2G connectivity using MQTT or REST. If the network drops, data is cached on the local cache of ESP32 and automatically synchronized once connectivity is restored.
 
 ### Cloud Backend Layer:
-The backend receives and reorders timestamped data, stores it in a database, exposes REST APIs to the mobile app, and classifies crowd level.
+The backend receives and stores timestamped data, stores it in database, exposes real time web sockets and REST APIs to the mobile app, and classifies crowd level.
 
 ### Application Layer:
-The passenger mobile app displays live bus tracking, traffic-aware ETA, crowd levels, and notifications using map services such as Google Maps Platform.
+The passenger mobile app displays live bus tracking, ETA, crowd levels, and notifications using map services such as Google Maps Platform.
 
 ### Data flow Diagram
-
+![Data flow](docs/assets/images/data_flow_diagram.png)
 
 
 ## Hardware and Software Designs
@@ -65,10 +66,9 @@ The passenger mobile app displays live bus tracking, traffic-aware ETA, crowd le
 
 - ESP32 CP2102 Type-C Development Board
 - NEO-M8N GPS Module
-- IR Sensor Pairs (4 Sensors / 2 Doors)
+- Ultrasonic Sensor Pairs (4 Sensors / 2 Doors)
 - SIM 800L GSM Module
-- SD Card Module
-- 3.7 V Li-Ion 1800 mAh battery
+- 3.7 V Li-Ion 3500 mAh battery
 - 16x2 I2C LCD Display
 - Emergency Push Button
 
@@ -85,22 +85,23 @@ The passenger mobile app displays live bus tracking, traffic-aware ETA, crowd le
 - REST API Framework
 - MQTT Broker
 - HTTP / MQTT Protocol
-- Cloud Hosting (AWS / Firebase)
+- Cloud Hosting (AWS)
 
 ### Database
 
-- NoSQL (Firebase)
+- AWS DynamoDB (realtime database)
+- AWS RDS (relational postgresql database)
 
 ### Frontend/Mobile Application
 
-- Android /Flutter/ Web
-- REST Client
+- Flutter
+- React
 
 ## Testing
 
 ### Hardware Testing
 
-- IR Sensor Testing for accurate passenger entry/exit detection.
+- Ultrasonic Sensor Testing for accurate passenger entry/exit detection.
 - GPS Testing in both stationary and moving conditions.
 - GSM module Testing for reliable connectivity.
 
@@ -119,17 +120,20 @@ Sensor detection → ESP32 processing → Cloud transmission → Backend storage
 
 | Item          | Quantity  | Unit Cost  | Total  |
 | ------------- |:---------:|:----------:|-------:|
-| ESP32 CP2102 Type-C Development Board    | 1         | 1500 LKR     | 1500 LKR |
-| NEO-M8N GPS Module    | 1         | 3500 LKR     | 3500 LKR |
-| SD-card module (for local storage)    | 1         | 500 LKR     | 500 LKR |
-| IR sensor pair    | 4         | 750 LKR     | 3000 LKR |
-| Battery(3.7V Li-ion) | 2  | 460 LKR  | 920 LKR |
-| SIM 800L 2G GSM Module | 1  | 1500 LKR   | 1500 LKR   |
+| ESP32 CP2102 Type-C Development Board    | 1         | 1490 LKR     | 1490 LKR |
+| NEO-M8N GPS Module    | 1         | 3990 LKR     | 3990 LKR |
+| Ultrasonic sensors    | 4         | 250 LKR     | 1000 LKR |
+| Battery(3.7V Li-ion) x 2 with holder | 2  | 1080 LKR  | 1080 LKR |
+| SIM 800L 2G GSM Module | 1  | 1190 LKR   | 1190 LKR   |
 | 16x2 I2C LCD Character Display | 1  | 1000 LKR   |  1000 LKR  |
-| Push Buttons | 2  | 35 LKR  |  70 LKR  |
-| Other components (cables etc.) |    |    | 5000 LKR   |
+| Push Buttons | 2  | 120 LKR  |  120 LKR  |
+| TP4056 Type-C 5V 1A Charging Module | 1  | 160 LKR  |  160 LKR  |
+| Boost Convertor | 1  | 290 LKR  |  290 LKR  |
+| LM2596 Buck Convertor | 1  | 290 LKR  |  290 LKR  |
+| Other components (cables etc.) |    |    | 1530 LKR   |
+| Enclosure 3D printing | 1  | 4500 LKR  |  4500 LKR  |
 | Estimated Total Cost  |    |    | 20000 LKR   |
 
 ## Conclusion
 
-The Bus Tracking & Passenger Management System demonstrates the design and implementation of a real-time, IoT-based transport monitoring solution integrating ESP32 hardware, dual-beam IR passenger counting, GPS tracking, cloud data processing, and a traffic-aware mobile application. The system demonstrated accurate occupancy detection, reliable live tracking, and robust offline data handling with automatic synchronization, ensuring zero data loss during connectivity failures. Future developments may include predictive analytics using historical data, integration with digital ticketing systems, AI-based demand forecasting, multi-bus fleet management dashboards, and enhanced security features. From a commercialization perspective, the solution is designed to be low-cost and scalable, making it suitable for deployment in university transport systems, private bus operators, and smart city initiatives, with potential expansion into a subscription-based fleet management service model.
+The Bus Tracking & Passenger Assistance System demonstrates the design and implementation of a real-time, IoT-based transport monitoring solution integrating ESP32 hardware, Ultrasonic sensor counting, GPS tracking, cloud data processing, and mobile application. The system demonstrated accurate occupancy detection, reliable live tracking, and robust offline data handling with automatic synchronization, ensuring zero data loss during connectivity failures. Future developments may include predictive analytics using historical data, integration with digital ticketing systems, AI-based demand forecasting, multi-bus fleet management dashboards, and enhanced security features. From a commercialization perspective, the solution is designed to be low-cost and scalable, making it suitable for deployment in university transport systems, private bus operators, and smart city initiatives, with potential expansion into a subscription-based fleet management service model.
