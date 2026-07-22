@@ -1,0 +1,31 @@
+{
+    "team": [
+        {
+            "name": "Thimal Adeesha",
+            "email": "e21017@eng.pdn.ac.lk",
+            "eNumber": "E/21/017"
+        },
+        {
+            "name": "Dinithi Epitakaduwa",
+            "email": "e21126@eng.pdn.ac.lk",
+            "eNumber": "E/21/126"
+        },
+        {
+            "name": "Lakshika Seneviratne",
+            "email": "e21372@eng.pdn.ac.lk",
+            "eNumber": "E/21/372"
+        },
+        {
+            "name": "Walter Ravindu",
+            "email": "e21391@eng.pdn.ac.lk",
+            "eNumber": "E/21/391"
+        }
+    ],
+    "supervisors": [
+        {
+            "name": "Ms. Yasodha Vimukthi",
+            "email": "yasodhav@eng.pdn.ac.lk"
+        }
+    ],
+    "tags": ["Web", "Embedded Systems"]
+}
