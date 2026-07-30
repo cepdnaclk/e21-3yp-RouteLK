@@ -1,4 +1,7 @@
 {
+  "visibility": true,
+  "title": "RouteLK",
+
     "team": [
         {
             "name": "Thimal Adeesha",
@@ -27,5 +30,8 @@
             "email": "yasodhav@eng.pdn.ac.lk"
         }
     ],
-    "tags": ["Web", "Embedded Systems"]
+    "tags": ["Web", "Embedded Systems"],
+
+    "image": "cover_page.png",
+    "thumbnail": "thumbnail.png"
 }
