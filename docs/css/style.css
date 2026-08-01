@@ -225,6 +225,7 @@ footer p {
 
 .dashboard {
     width: 360px;
+    max-width: 100%;
     padding: 30px;
     background: rgba(255, 255, 255, .08);
     backdrop-filter: blur(20px);
@@ -396,8 +397,30 @@ footer p {
 }
 
 @media(max-width:900px) {
+    .navbar {
+        position: relative;
+    }
+
     .nav-links {
-        display: none
+        display: none;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: rgba(7, 17, 31, 0.96);
+        backdrop-filter: blur(25px);
+        border: 1px solid var(--panel-strong);
+        border-radius: 20px;
+        flex-direction: column;
+        gap: 15px;
+        padding: 25px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        z-index: 99;
+        text-align: center;
+    }
+
+    .nav-links.nav-active {
+        display: flex;
     }
 
     .hero {
@@ -721,16 +744,20 @@ footer p {
 
 
 
-/* ===============================
-   BUDGET TABLE
-================================ */
-
-
+.table-responsive {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .05);
+}
 
 .budget-table {
 
 
-    width: 80%;
+    width: 100%;
 
 
     margin: 50px auto;
@@ -2144,5 +2171,468 @@ footer .social i:hover {
 
     .supervisors-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* =====================================
+   PROJECT TIMELINE SECTION
+===================================== */
+
+#timeline {
+    position: relative;
+    padding: 100px 8%;
+    background: #07111f;
+    overflow: hidden;
+}
+
+/* Progress Indicator */
+.timeline-progress-wrapper {
+    max-width: 600px;
+    margin: 0 auto 60px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.timeline-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.timeline-progress-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.timeline-progress-label i {
+    color: var(--gold);
+    margin-right: 6px;
+}
+
+.timeline-progress-percentage {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(248, 198, 61, 0.3);
+}
+
+.timeline-progress.progress {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.timeline-progress.progress span {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--gold) 0%, #ffe08a 100%);
+    box-shadow: 0 0 15px var(--gold);
+    transition: width 1.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+/* Roadmap Track */
+.timeline-roadmap {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 20px 0;
+}
+
+.timeline-line-wrapper {
+    position: relative;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.timeline-line-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+}
+
+.timeline-line-progress {
+    position: absolute;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold) 0%, #ffe08a 100%);
+    box-shadow: 0 0 12px var(--gold);
+    border-radius: 2px;
+    transition: width 1.8s ease-in-out;
+}
+
+.timeline-node {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+}
+
+.timeline-node .node-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #0d1830;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.timeline-node.completed .node-dot {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #0d1830;
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.timeline-node.active .node-dot {
+    background: #07111f;
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(248, 198, 61, 0.6);
+}
+
+.node-pulse-ring {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    animation: nodePulse 2s infinite ease-out;
+}
+
+.timeline-week-markers {
+    position: relative;
+    height: 20px;
+    margin-top: 10px;
+}
+
+.week-marker {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.timeline-roadmap .timeline-node:hover .node-dot {
+    transform: scale(1.15);
+}
+
+/* Milestone Cards */
+.timeline-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    margin-top: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.timeline-card {
+    position: relative;
+    padding: 35px 25px 30px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    overflow: hidden;
+}
+
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(248, 198, 61, 0.12) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.timeline-card:hover .card-glow {
+    opacity: 1;
+}
+
+.timeline-card:hover {
+    transform: translateY(-10px) !important;
+    border-color: rgba(248, 198, 61, 0.35) !important;
+    box-shadow: 0 15px 30px rgba(7, 17, 31, 0.5), 0 0 25px rgba(248, 198, 61, 0.15) !important;
+}
+
+.milestone-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.completed-card .milestone-badge {
+    color: var(--gold);
+    background: rgba(248, 198, 61, 0.08);
+    border-color: rgba(248, 198, 61, 0.15);
+}
+
+.active-card .milestone-badge {
+    color: #fff;
+    background: rgba(31, 111, 235, 0.15);
+    border-color: rgba(31, 111, 235, 0.25);
+}
+
+.milestone-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.completed-card .milestone-icon-wrapper {
+    color: var(--gold);
+    background: rgba(248, 198, 61, 0.04);
+    border-color: rgba(248, 198, 61, 0.12);
+}
+
+.active-card .milestone-icon-wrapper {
+    background: linear-gradient(135deg, var(--gold) 0%, #ffe08a 100%);
+    color: #07111f;
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(248, 198, 61, 0.4);
+}
+
+.timeline-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.milestone-weeks {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 22px;
+    display: block;
+}
+
+.milestone-status {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    margin-top: auto;
+}
+
+.completed-card .milestone-status {
+    color: var(--gold);
+    background: rgba(248, 198, 61, 0.04);
+    border-color: rgba(248, 198, 61, 0.1);
+}
+
+.active-card {
+    border-color: rgba(248, 198, 61, 0.45) !important;
+    box-shadow: 0 0 25px rgba(248, 198, 61, 0.15), inset 0 0 15px rgba(248, 198, 61, 0.02) !important;
+    animation: activeCardGlow 3s infinite alternate ease-in-out;
+}
+
+.active-card .milestone-status.in-progress {
+    color: var(--gold);
+    background: rgba(248, 198, 61, 0.08);
+    border-color: rgba(248, 198, 61, 0.2);
+}
+
+.status-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+/* Animations */
+@keyframes nodePulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+@keyframes dotPulse {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.5;
+        box-shadow: 0 0 0 0 rgba(248, 198, 61, 0.7);
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+        box-shadow: 0 0 0 6px rgba(248, 198, 61, 0);
+    }
+    100% {
+        transform: scale(0.85);
+        opacity: 0.5;
+        box-shadow: 0 0 0 0 rgba(248, 198, 61, 0);
+    }
+}
+
+@keyframes activeCardGlow {
+    0% {
+        border-color: rgba(248, 198, 61, 0.25);
+        box-shadow: 0 0 15px rgba(248, 198, 61, 0.05);
+    }
+    100% {
+        border-color: rgba(248, 198, 61, 0.65);
+        box-shadow: 0 0 30px rgba(248, 198, 61, 0.22);
+    }
+}
+
+/* Media Queries for Timeline Section */
+@media (max-width: 1100px) {
+    .timeline-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .timeline-roadmap {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 900px) {
+    .timeline-roadmap {
+        display: none; /* Hide top roadmap tracker on vertical stacked mode */
+    }
+    
+    .timeline-cards {
+        grid-template-columns: 1fr;
+        position: relative;
+        padding-left: 35px;
+        max-width: 600px;
+    }
+    
+    /* Vertical connecting line */
+    .timeline-cards::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 40px;
+        bottom: 40px;
+        width: 3px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+        z-index: 1;
+    }
+    
+    /* Active vertical progress fill */
+    .timeline-cards::after {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 40px;
+        height: 75%; /* Spans 3/4ths of the stack height */
+        width: 3px;
+        background: linear-gradient(180deg, var(--gold) 0%, #ffe08a 100%);
+        box-shadow: 0 0 10px var(--gold);
+        border-radius: 2px;
+        z-index: 1;
+    }
+    
+    .timeline-card {
+        text-align: left;
+        align-items: flex-start;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    
+    .timeline-card h3 {
+        justify-content: flex-start;
+        min-height: auto;
+        margin-top: 5px;
+    }
+    
+    /* Connecting nodes on mobile stacked list */
+    .timeline-card::after {
+        content: "";
+        position: absolute;
+        left: -32px;
+        top: 45px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #0d1830;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        z-index: 3;
+        transition: all 0.3s ease;
+    }
+    
+    .completed-card::after {
+        background: var(--gold);
+        border-color: var(--gold);
+        box-shadow: 0 0 10px var(--gold);
+    }
+    
+    .active-card::after {
+        background: #07111f;
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(248, 198, 61, 0.6);
+        animation: dotPulse 1.5s infinite ease-in-out;
     }
 }

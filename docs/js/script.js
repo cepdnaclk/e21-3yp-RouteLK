@@ -594,40 +594,30 @@ window.addEventListener(
 
 
 
-const nav =
-    document.querySelector(
-        ".nav-links"
-    );
+const nav = document.querySelector(".nav-links");
+const navButton = document.querySelector(".nav-btn");
 
+if (navButton && nav) {
+    navButton.addEventListener("click", (e) => {
+        if (window.innerWidth < 900) {
+            e.stopPropagation();
+            nav.classList.toggle("nav-active");
+        }
+    });
 
+    document.addEventListener("click", (e) => {
+        if (window.innerWidth < 900 && nav.classList.contains("nav-active") && !nav.contains(e.target) && e.target !== navButton) {
+            nav.classList.remove("nav-active");
+        }
+    });
 
-const navButton =
-    document.querySelector(
-        ".nav-btn"
-    );
-
-
-
-if (window.innerWidth < 900) {
-
-
-    navButton.addEventListener(
-        "click",
-        () => {
-
-
-            nav.style.display =
-                nav.style.display === "flex"
-                    ?
-                    "none"
-                    :
-                    "flex";
-
-
-
+    nav.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            if (window.innerWidth < 900) {
+                nav.classList.remove("nav-active");
+            }
         });
-
-
+    });
 }
 
 
